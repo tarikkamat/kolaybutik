@@ -45,8 +45,8 @@ class WalletService
         try {
             $sessionId = Session::getId();
 
-            // Sepet kontrolü
-            $cartSummary = $this->cartService->getCartSummary();
+            // Demo mod için cart summary kontrolü
+            $cartSummary = $data['demo_cart_summary'] ?? $this->cartService->getCartSummary();
 
             if (empty($cartSummary['items'])) {
                 return [
@@ -56,12 +56,15 @@ class WalletService
                 ];
             }
 
+            $subtotal = $cartSummary['subtotal'];
+            $total = $cartSummary['total'];
+
             // Request oluştur
             $request = new CreatePayWithIyzicoInitializeRequest();
             $request->setLocale(Locale::TR);
             $request->setConversationId(uniqid('conv_', true));
-            $request->setPrice(number_format($cartSummary['subtotal'], 2, '.', ''));
-            $request->setPaidPrice(number_format($cartSummary['total'], 2, '.', ''));
+            $request->setPrice(number_format($subtotal, 2, '.', ''));
+            $request->setPaidPrice(number_format($total, 2, '.', ''));
             $request->setCurrency(Currency::TL);
             $request->setBasketId('BASKET_'.time());
             $request->setPaymentGroup(PaymentGroup::PRODUCT);

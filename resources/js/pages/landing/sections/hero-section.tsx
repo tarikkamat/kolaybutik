@@ -6,7 +6,15 @@ import {
     CheckCircle2,
     CreditCard,
     Wallet,
+    ChevronDown,
 } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function HeroSection() {
     return (
@@ -50,19 +58,25 @@ export default function HeroSection() {
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </a>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                onClick={() => {
-                                    document
-                                        .getElementById('how-it-works')
-                                        ?.scrollIntoView({
-                                            behavior: 'smooth',
-                                        });
-                                }}
-                            >
-                                Canlı Demo
-                            </Button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button size="lg" variant="outline">
+                                        Canlı Demo
+                                        <ChevronDown className="ml-2 h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/store">Test Mağaza</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/subscription">Test Abonelik</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/services/iyzico-link">Test iyziLink</Link>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                         <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-600 lg:justify-start dark:text-slate-400">
                             <div className="flex items-center gap-2">

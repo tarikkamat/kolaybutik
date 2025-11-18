@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from '@inertiajs/react';
 import {
     CreditCard,
     FileText,
@@ -17,6 +18,7 @@ export default function AdditionalServicesSection() {
             description:
                 'Müşterilerinizin kart bilgilerini güvenli bir şekilde saklayın. Tek tıkla hızlı ödeme.',
             color: 'indigo',
+            href: '/services/card-storage',
         },
         {
             icon: FileText,
@@ -24,6 +26,7 @@ export default function AdditionalServicesSection() {
             description:
                 'Detaylı ödeme raporları ve finansal analizler. İşinizi veri ile yönetin.',
             color: 'emerald',
+            href: '/services/reports',
         },
         {
             icon: Webhook,
@@ -31,6 +34,7 @@ export default function AdditionalServicesSection() {
             description:
                 'Gerçek zamanlı bildirimler. Ödeme durumlarını anında takip edin.',
             color: 'purple',
+            href: '/services/webhook-catcher',
         },
         {
             icon: RotateCcw,
@@ -38,6 +42,7 @@ export default function AdditionalServicesSection() {
             description:
                 'Kolay iptal ve iade işlemleri. Müşteri memnuniyeti için esnek çözümler.',
             color: 'amber',
+            href: '/services',
         },
         {
             icon: TrendingUp,
@@ -45,6 +50,7 @@ export default function AdditionalServicesSection() {
             description:
                 'Taksitli ödeme seçenekleri. Müşterilerinize esnek ödeme imkanı sunun.',
             color: 'blue',
+            href: '/services/installment-bin',
         },
         {
             icon: Hash,
@@ -52,6 +58,7 @@ export default function AdditionalServicesSection() {
             description:
                 'Kart numarasına göre banka ve kart tipi bilgilerini alın.',
             color: 'rose',
+            href: '/services/installment-bin',
         },
         {
             icon: Lock,
@@ -59,6 +66,7 @@ export default function AdditionalServicesSection() {
             description:
                 'API çağrılarınızın güvenliğini sağlamak için imza mekanizması.',
             color: 'teal',
+            href: '/services',
         },
     ];
 
@@ -118,25 +126,30 @@ export default function AdditionalServicesSection() {
                         return (
                             <Card
                                 key={index}
-                                className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800"
+                                className="group border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800"
                             >
-                                <CardHeader>
-                                    <div
-                                        className={`mb-4 inline-flex rounded-lg p-3 ${colors.bg}`}
-                                    >
-                                        <Icon
-                                            className={`h-6 w-6 ${colors.icon}`}
-                                        />
-                                    </div>
-                                    <CardTitle className="text-slate-900 dark:text-white">
-                                        {service.title}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-slate-600 dark:text-slate-400">
-                                        {service.description}
-                                    </p>
-                                </CardContent>
+                                <Link
+                                    href={service.href}
+                                    className="block h-full"
+                                >
+                                    <CardHeader>
+                                        <div
+                                            className={`mb-4 inline-flex rounded-lg p-3 ${colors.bg}`}
+                                        >
+                                            <Icon
+                                                className={`h-6 w-6 ${colors.icon}`}
+                                            />
+                                        </div>
+                                        <CardTitle className="text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
+                                            {service.title}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-slate-600 dark:text-slate-400">
+                                            {service.description}
+                                        </p>
+                                    </CardContent>
+                                </Link>
                             </Card>
                         );
                     })}

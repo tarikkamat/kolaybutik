@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { QuickDemoButton } from '@/components/quick-demo-button';
 import { Code, CreditCard, ExternalLink, Lock } from 'lucide-react';
 
 export default function PaymentMethodsSection() {
@@ -35,7 +36,7 @@ export default function PaymentMethodsSection() {
                                 Non-3DS ve 3DS ödeme işlemlerini kendi
                                 sisteminizden yönetin.
                             </p>
-                            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                            <ul className="mb-6 space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li className="flex items-center gap-2">
                                     <Lock className="h-4 w-4 text-emerald-600" />
                                     <span>Non-3DS desteği</span>
@@ -49,6 +50,7 @@ export default function PaymentMethodsSection() {
                                     <span>Tam kontrol</span>
                                 </li>
                             </ul>
+                            <QuickDemoButton href="/demo/credit-card" color="indigo" />
                         </CardContent>
                     </Card>
 
@@ -68,7 +70,7 @@ export default function PaymentMethodsSection() {
                                 entegrasyon. PCI DSS yükümlülüklerinden muaf
                                 kalın.
                             </p>
-                            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                            <ul className="mb-6 space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li className="flex items-center gap-2">
                                     <Lock className="h-4 w-4 text-emerald-600" />
                                     <span>Hızlı kurulum</span>
@@ -82,6 +84,7 @@ export default function PaymentMethodsSection() {
                                     <span>Özelleştirilebilir</span>
                                 </li>
                             </ul>
+                            <QuickDemoButton href="/demo/checkout-form" color="emerald" />
                         </CardContent>
                     </Card>
 
@@ -101,7 +104,7 @@ export default function PaymentMethodsSection() {
                                 en hızlı entegrasyon. Minimum kod ile maksimum
                                 sonuç.
                             </p>
-                            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                            <ul className="mb-6 space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li className="flex items-center gap-2">
                                     <Lock className="h-4 w-4 text-emerald-600" />
                                     <span>Minimum kod</span>
@@ -115,6 +118,7 @@ export default function PaymentMethodsSection() {
                                     <span>Hızlı entegrasyon</span>
                                 </li>
                             </ul>
+                            <QuickDemoButton href="/demo/pay-with-iyzico" color="amber" />
                         </CardContent>
                     </Card>
                 </div>

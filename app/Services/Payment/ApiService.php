@@ -45,7 +45,8 @@ class ApiService
     public function processCreditCardPayment(array $data): ?array
     {
         try {
-            $cartSummary = $this->cartService->getCartSummary();
+            // Demo mod için cart summary kontrolü
+            $cartSummary = $data['demo_cart_summary'] ?? $this->cartService->getCartSummary();
 
             if (empty($cartSummary['items'])) {
                 return [
@@ -55,11 +56,14 @@ class ApiService
                 ];
             }
 
+            $subtotal = $cartSummary['subtotal'];
+            $total = $cartSummary['total'];
+
             $request = new CreatePaymentRequest();
             $request->setLocale(Locale::TR);
             $request->setConversationId(uniqid('conv_', true));
-            $request->setPrice(number_format($cartSummary['subtotal'], 2, '.', ''));
-            $request->setPaidPrice(number_format($cartSummary['total'], 2, '.', ''));
+            $request->setPrice(number_format($subtotal, 2, '.', ''));
+            $request->setPaidPrice(number_format($total, 2, '.', ''));
             $request->setCurrency(Currency::TL);
             $request->setInstallment(1);
             $request->setBasketId('BASKET_'.time());
@@ -170,7 +174,8 @@ class ApiService
     public function initializeThreedsPayment(array $data): ?array
     {
         try {
-            $cartSummary = $this->cartService->getCartSummary();
+            // Demo mod için cart summary kontrolü
+            $cartSummary = $data['demo_cart_summary'] ?? $this->cartService->getCartSummary();
 
             if (empty($cartSummary['items'])) {
                 return [
@@ -180,11 +185,14 @@ class ApiService
                 ];
             }
 
+            $subtotal = $cartSummary['subtotal'];
+            $total = $cartSummary['total'];
+
             $request = new CreatePaymentRequest();
             $request->setLocale(Locale::TR);
             $request->setConversationId(uniqid('conv_', true));
-            $request->setPrice(number_format($cartSummary['subtotal'], 2, '.', ''));
-            $request->setPaidPrice(number_format($cartSummary['total'], 2, '.', ''));
+            $request->setPrice(number_format($subtotal, 2, '.', ''));
+            $request->setPaidPrice(number_format($total, 2, '.', ''));
             $request->setCurrency(Currency::TL);
             $request->setInstallment(1);
             $request->setBasketId('BASKET_'.time());

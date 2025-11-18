@@ -29,4 +29,19 @@ return [
         'secret_key' => env('IYZIPAY_QUICK_PWI_SECRET_KEY') ?: env('IYZIPAY_SECRET_KEY'),
         'base_url' => env('IYZIPAY_QUICK_PWI_BASE_URL') ?: env('IYZIPAY_BASE_URL', 'https://api.iyzipay.com'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Subscription API Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Abonelik işlemleri için farklı API credentials kullanılabilir.
+    | Eğer belirtilmezse, yukarıdaki ana credentials kullanılır.
+    |
+    */
+    'subscription' => [
+        'api_key' => env('IYZIPAY_SUBSCRIPTION_API_KEY') ?: env('IYZIPAY_API_KEY'),
+        'secret_key' => env('IYZIPAY_SUBSCRIPTION_SECRET_KEY') ?: env('IYZIPAY_SECRET_KEY'),
+        'base_url' => env('IYZIPAY_SUBSCRIPTION_BASE_URL') ?: env('IYZIPAY_BASE_URL', 'https://api.iyzipay.com'),
+    ],
 ];

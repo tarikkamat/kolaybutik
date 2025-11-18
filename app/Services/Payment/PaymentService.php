@@ -8,17 +8,20 @@ class PaymentService
     private CheckoutFormService $checkoutFormService;
     private QuickPwiService $quickPwiService;
     private WalletService $walletService;
+    private IyzicoLinkService $iyzicoLinkService;
 
     public function __construct(
         ApiService $apiService,
         CheckoutFormService $checkoutFormService,
         QuickPwiService $quickPwiService,
         WalletService $walletService,
+        IyzicoLinkService $iyzicoLinkService,
     ) {
         $this->apiService = $apiService;
         $this->checkoutFormService = $checkoutFormService;
         $this->quickPwiService = $quickPwiService;
         $this->walletService = $walletService;
+        $this->iyzicoLinkService = $iyzicoLinkService;
     }
 
     /**
@@ -166,6 +169,85 @@ class PaymentService
     {
         // TODO: Get saved cards from iyzico
         return null;
+    }
+
+    /**
+     * Create iyzico Link
+     *
+     * @param  array  $data
+     * @return array|null
+     */
+    public function createIyziLink(array $data): ?array
+    {
+        return $this->iyzicoLinkService->createIyziLink($data);
+    }
+
+    /**
+     * Create Fastlink
+     *
+     * @param  array  $data
+     * @return array|null
+     */
+    public function createFastlink(array $data): ?array
+    {
+        return $this->iyzicoLinkService->createFastlink($data);
+    }
+
+    /**
+     * Retrieve iyzico Link details
+     *
+     * @param  string  $token
+     * @return array|null
+     */
+    public function retrieveIyziLink(string $token): ?array
+    {
+        return $this->iyzicoLinkService->retrieveIyziLink($token);
+    }
+
+    /**
+     * List iyzico Links
+     *
+     * @param  array  $data
+     * @return array|null
+     */
+    public function listIyziLinks(array $data = []): ?array
+    {
+        return $this->iyzicoLinkService->listIyziLinks($data);
+    }
+
+    /**
+     * Update iyzico Link
+     *
+     * @param  string  $token
+     * @param  array  $data
+     * @return array|null
+     */
+    public function updateIyziLink(string $token, array $data): ?array
+    {
+        return $this->iyzicoLinkService->updateIyziLink($token, $data);
+    }
+
+    /**
+     * Update iyzico Link status
+     *
+     * @param  string  $token
+     * @param  string  $status
+     * @return array|null
+     */
+    public function updateIyziLinkStatus(string $token, string $status): ?array
+    {
+        return $this->iyzicoLinkService->updateIyziLinkStatus($token, $status);
+    }
+
+    /**
+     * Delete iyzico Link
+     *
+     * @param  string  $token
+     * @return array|null
+     */
+    public function deleteIyziLink(string $token): ?array
+    {
+        return $this->iyzicoLinkService->deleteIyziLink($token);
     }
 }
 

@@ -1,5 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface LegalPageLayoutProps {
     title: string;
@@ -67,14 +74,23 @@ export default function LandingLayout({
                                 >
                                     Faydalı Servisler
                                 </Link>
-                                <a
-                                    href="https://docs.iyzico.com"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-                                >
-                                    Canlı Demo
-                                </a>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 flex items-center gap-1">
+                                        Canlı Demo
+                                        <ChevronDown className="h-4 w-4" />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/store">Test Mağaza</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/subscription">Test Abonelik</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/services/iyzico-link">Test iyziLink</Link>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
                     </div>
@@ -128,12 +144,12 @@ export default function LandingLayout({
                                         </a>
                                     </li>
                                     <li>
-                                        <Link
-                                            href="#"
+                                        <a
+                                            href="mailto:entegrasyon@iyzico.com"
                                             className="hover:text-indigo-600"
                                         >
                                             Destek
-                                        </Link>
+                                        </a>
                                     </li>
                                 </ul>
                             </div>

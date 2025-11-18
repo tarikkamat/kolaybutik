@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from '@inertiajs/react';
 import {
     CreditCard,
     Link as LinkIcon,
@@ -17,6 +18,7 @@ export default function ProductsSection() {
             description:
                 'Kredi kartı, banka kartı ve dijital cüzdan ile güvenli online ödeme alın.',
             color: 'indigo',
+            href: '/demo/credit-card',
         },
         {
             icon: Store,
@@ -24,6 +26,7 @@ export default function ProductsSection() {
             description:
                 'Çoklu satıcı yapısı ile pazaryeri modelinizi oluşturun ve komisyon yönetimi yapın.',
             color: 'emerald',
+            href: '/store',
         },
         {
             icon: Repeat,
@@ -31,6 +34,7 @@ export default function ProductsSection() {
             description:
                 'Tekrarlayan ödemeler için abonelik yönetimi. Otomatik yenileme ve iptal işlemleri.',
             color: 'purple',
+            href: '/subscription',
         },
         {
             icon: Wallet,
@@ -38,6 +42,7 @@ export default function ProductsSection() {
             description:
                 'Havale ve EFT ile ödeme alın. Ödeme onaylandıktan sonra ürün/hizmet teslim edilir.',
             color: 'amber',
+            href: '/demo/checkout-form',
         },
         {
             icon: LinkIcon,
@@ -45,6 +50,7 @@ export default function ProductsSection() {
             description:
                 'Hızlı ödeme linkleri oluşturun. Müşterileriniz link üzerinden kolayca ödeme yapsın.',
             color: 'blue',
+            href: '/services/iyzico-link',
         },
         {
             icon: ShoppingCart,
@@ -52,6 +58,7 @@ export default function ProductsSection() {
             description:
                 'Müşterilerinize taksitli alışveriş kredisi seçeneği sunun.',
             color: 'rose',
+            href: '/services/installment-bin',
         },
         {
             icon: TrendingUp,
@@ -59,6 +66,7 @@ export default function ProductsSection() {
             description:
                 'Toplu ödeme çözümü. Satıcılara, iş ortaklarına veya müşterilere toplu ödeme yapın.',
             color: 'teal',
+            href: '/services/reports',
         },
     ];
 
@@ -116,10 +124,8 @@ export default function ProductsSection() {
                                 product.color as keyof typeof colorClasses
                             ];
                         return (
-                            <Card
-                                key={index}
-                                className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800"
-                            >
+                            <Link key={index} href={product.href}>
+                                <Card className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
                                 <CardHeader>
                                     <div
                                         className={`mb-4 inline-flex rounded-lg p-3 ${colors.bg}`}
@@ -138,6 +144,7 @@ export default function ProductsSection() {
                                     </p>
                                 </CardContent>
                             </Card>
+                            </Link>
                         );
                     })}
                 </div>

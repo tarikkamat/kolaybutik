@@ -45,7 +45,8 @@ class CheckoutFormService
         try {
             $sessionId = Session::getId();
 
-            $cartSummary = $this->cartService->getCartSummary();
+            // Demo mod için cart summary kontrolü
+            $cartSummary = $data['demo_cart_summary'] ?? $this->cartService->getCartSummary();
 
             if (empty($cartSummary['items'])) {
                 return [
@@ -55,11 +56,14 @@ class CheckoutFormService
                 ];
             }
 
+            $subtotal = $cartSummary['subtotal'];
+            $total = $cartSummary['total'];
+
             $request = new CreateCheckoutFormInitializeRequest();
             $request->setLocale(Locale::TR);
             $request->setConversationId(uniqid('conv_', true));
-            $request->setPrice(number_format($cartSummary['subtotal'], 2, '.', ''));
-            $request->setPaidPrice(number_format($cartSummary['total'], 2, '.', ''));
+            $request->setPrice(number_format($subtotal, 2, '.', ''));
+            $request->setPaidPrice(number_format($total, 2, '.', ''));
             $request->setCurrency(Currency::TL);
             $request->setBasketId('BASKET_'.time());
             $request->setPaymentGroup(PaymentGroup::PRODUCT);
@@ -119,14 +123,29 @@ class CheckoutFormService
             }
             $request->setBasketItems($basketItems);
 
-            // Checkout form initialize
+            // Checkout form initialize - performans ölçümü
+            $startTime = microtime(true);
+            Log::info('CheckoutFormService: API isteği başlatılıyor', [
+                'conversation_id' => $request->getConversationId(),
+                'price' => $request->getPrice(),
+                'base_url' => $this->options->getBaseUrl(),
+            ]);
+
             $checkoutFormInitialize = CheckoutFormInitialize::create($request, $this->options);
+
+            $endTime = microtime(true);
+            $duration = ($endTime - $startTime) * 1000; // milisaniye cinsinden
+            Log::info('CheckoutFormService: API isteği tamamlandı', [
+                'duration_ms' => round($duration, 2),
+                'status' => $checkoutFormInitialize->getStatus(),
+                'conversation_id' => $checkoutFormInitialize->getConversationId(),
+            ]);
 
             if ($checkoutFormInitialize->getStatus() === 'success') {
                 // Session'a bilgileri kaydet
                 Session::put('checkout_form_token', $checkoutFormInitialize->getToken());
                 Session::put('checkout_form_conversation_id', $checkoutFormInitialize->getConversationId());
-                Session::put('checkout_form_initial_price', $cartSummary['total']);
+                Session::put('checkout_form_initial_price', $total);
 
                 return [
                     'status' => 'success',

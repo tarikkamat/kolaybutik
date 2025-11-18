@@ -1,5 +1,5 @@
 import { Lock } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 
 interface QuickPwiProps {
@@ -19,6 +19,9 @@ export function QuickPwi({ formData }: QuickPwiProps) {
     const [checkoutFormContent, setCheckoutFormContent] = useState<string | null>(null);
     const [checkoutFormError, setCheckoutFormError] = useState<string | null>(null);
     const [checkoutFormToken, setCheckoutFormToken] = useState<string | null>(null);
+    const requestInProgressRef = useRef(false);
+    const abortControllerRef = useRef<AbortController | null>(null);
+    const requestedKeysRef = useRef<Set<string>>(new Set());
 
     // Checkout form initialize - iletişim bilgileri doldurulduğunda
     useEffect(() => {
@@ -33,12 +36,29 @@ export function QuickPwi({ formData }: QuickPwiProps) {
             isValidEmail &&
             formData.phone?.trim();
 
+        // FormData'ya göre unique key oluştur
+        const requestKey = `${formData.full_name?.trim()}_${formData.email?.trim()}_${formData.phone?.trim()}`;
+
         if (
             !checkoutFormContent &&
             !checkoutFormLoading &&
             !checkoutFormError &&
+            !requestInProgressRef.current &&
+            !requestedKeysRef.current.has(requestKey) &&
             isContactInfoFilled
         ) {
+            // Önceki isteği iptal et
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+
+            // Yeni AbortController oluştur
+            const abortController = new AbortController();
+            abortControllerRef.current = abortController;
+
+            // Bu key'i işaretle
+            requestedKeysRef.current.add(requestKey);
+            requestInProgressRef.current = true;
             setCheckoutFormLoading(true);
             setCheckoutFormError(null);
 
@@ -46,6 +66,10 @@ export function QuickPwi({ formData }: QuickPwiProps) {
             const csrfToken = document
                 .querySelector('meta[name="csrf-token"]')
                 ?.getAttribute('content') || '';
+
+            // requestKey'i closure içinde sakla
+            const currentRequestKey = requestKey;
+            let requestCompleted = false;
 
             fetch('/store/payment/quick-pwi/initialize', {
                 method: 'POST',
@@ -64,8 +88,14 @@ export function QuickPwi({ formData }: QuickPwiProps) {
                     postal_code: formData.postal_code,
                     country: formData.country || 'Türkiye',
                 }),
+                signal: abortController.signal,
             })
                 .then(async (response) => {
+                    // İstek iptal edildiyse işlem yapma
+                    if (abortController.signal.aborted) {
+                        return;
+                    }
+
                     const data = await response.json();
 
                     if (!response.ok) {
@@ -90,19 +120,43 @@ export function QuickPwi({ formData }: QuickPwiProps) {
 
                         setCheckoutFormContent(data.data.checkoutFormContent);
                         setCheckoutFormToken(data.data.token || null);
+                        requestCompleted = true;
                     } else {
                         setCheckoutFormError(data.errorMessage || data.message || 'Ödeme formu yüklenemedi');
+                        requestCompleted = true;
                     }
                 })
                 .catch((error) => {
+                    // AbortError'ı görmezden gel
+                    if (error.name === 'AbortError') {
+                        return;
+                    }
                     setCheckoutFormError(error.message || 'Bir hata oluştu');
+                    requestCompleted = true;
                 })
                 .finally(() => {
-                    setCheckoutFormLoading(false);
+                    // İstek tamamlandıysa (başarılı veya hatalı) loading'i false yap
+                    // Abort edilmiş olsa bile, eğer response geldiyse loading'i false yap
+                    if (requestCompleted || !abortController.signal.aborted) {
+                        setCheckoutFormLoading(false);
+                        requestInProgressRef.current = false;
+                    } else {
+                        // İptal edildiyse key'i geri al
+                        requestedKeysRef.current.delete(currentRequestKey);
+                        requestInProgressRef.current = false;
+                    }
                 });
         }
+
+        // Cleanup function - component unmount veya dependency değiştiğinde
+        // Not: Abort etmiyoruz çünkü StrictMode'da component mount -> unmount -> mount döngüsü var
+        // ve istek zaten tamamlanmış olabilir. Abort etmek sadece yeni istek atılırken yapılmalı.
+        return () => {
+            // Cleanup'ta abort etme - sadece ref'i temizle
+            // Abort işlemi sadece yeni istek atılırken yapılacak
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [checkoutFormContent, checkoutFormLoading, checkoutFormError, formData.full_name, formData.email, formData.phone]);
+    }, [checkoutFormContent, formData.full_name, formData.email, formData.phone]);
 
     // Checkout form content yüklendiğinde script'i dinamik olarak ekle
     useEffect(() => {
@@ -111,7 +165,7 @@ export function QuickPwi({ formData }: QuickPwiProps) {
             const frameId = requestAnimationFrame(() => {
                 // Bir sonraki frame'de div'in DOM'da olduğundan emin ol
                 requestAnimationFrame(() => {
-                    const checkoutFormDiv = document.getElementById('quick-pwi-checkout-form');
+                    const checkoutFormDiv = document.getElementById('iyzipay-checkout-form');
 
                     if (checkoutFormDiv) {
                         // Önce div'i temizle
@@ -166,8 +220,8 @@ export function QuickPwi({ formData }: QuickPwiProps) {
             const scriptsInBody = document.querySelectorAll('script[src*="iyzipay"], script[src*="checkoutform"]');
             scriptsInBody.forEach((s) => s.remove());
 
-            // quick-pwi-checkout-form div'ini temizle
-            const checkoutFormDiv = document.getElementById('quick-pwi-checkout-form');
+            // iyzipay-checkout-form div'ini temizle
+            const checkoutFormDiv = document.getElementById('iyzipay-checkout-form');
             if (checkoutFormDiv) {
                 checkoutFormDiv.innerHTML = '';
             }
@@ -199,7 +253,7 @@ export function QuickPwi({ formData }: QuickPwiProps) {
 
             {checkoutFormContent && !checkoutFormLoading && (
                 <div className="w-full">
-                    <div id="quick-pwi-checkout-form" className="responsive"></div>
+                    <div id="iyzipay-checkout-form" className="responsive"></div>
                 </div>
             )}
 

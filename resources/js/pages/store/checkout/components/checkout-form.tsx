@@ -1,5 +1,5 @@
 import { Lock } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 
 interface CheckoutFormProps {
@@ -12,13 +12,17 @@ interface CheckoutFormProps {
         postal_code?: string;
         country?: string;
     };
+    initializeEndpoint?: string;
 }
 
-export function CheckoutForm({ formData }: CheckoutFormProps) {
+export function CheckoutForm({ formData, initializeEndpoint = '/store/payment/checkout-form/initialize' }: CheckoutFormProps) {
     const [checkoutFormLoading, setCheckoutFormLoading] = useState(false);
     const [checkoutFormContent, setCheckoutFormContent] = useState<string | null>(null);
     const [checkoutFormError, setCheckoutFormError] = useState<string | null>(null);
     const [checkoutFormToken, setCheckoutFormToken] = useState<string | null>(null);
+    const requestInProgressRef = useRef(false);
+    const abortControllerRef = useRef<AbortController | null>(null);
+    const requestedKeysRef = useRef<Set<string>>(new Set());
 
     // Checkout form initialize - iletişim bilgileri doldurulduğunda
     useEffect(() => {
@@ -33,12 +37,29 @@ export function CheckoutForm({ formData }: CheckoutFormProps) {
             isValidEmail &&
             formData.phone?.trim();
 
+        // FormData'ya göre unique key oluştur
+        const requestKey = `${formData.full_name?.trim()}_${formData.email?.trim()}_${formData.phone?.trim()}`;
+
         if (
             !checkoutFormContent &&
             !checkoutFormLoading &&
             !checkoutFormError &&
+            !requestInProgressRef.current &&
+            !requestedKeysRef.current.has(requestKey) &&
             isContactInfoFilled
         ) {
+            // Önceki isteği iptal et
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+
+            // Yeni AbortController oluştur
+            const abortController = new AbortController();
+            abortControllerRef.current = abortController;
+
+            // Bu key'i işaretle
+            requestedKeysRef.current.add(requestKey);
+            requestInProgressRef.current = true;
             setCheckoutFormLoading(true);
             setCheckoutFormError(null);
 
@@ -47,7 +68,11 @@ export function CheckoutForm({ formData }: CheckoutFormProps) {
                 .querySelector('meta[name="csrf-token"]')
                 ?.getAttribute('content') || '';
 
-            fetch('/store/payment/checkout-form/initialize', {
+            // requestKey'i closure içinde sakla
+            const currentRequestKey = requestKey;
+            let requestCompleted = false;
+
+            fetch(initializeEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -64,8 +89,14 @@ export function CheckoutForm({ formData }: CheckoutFormProps) {
                     postal_code: formData.postal_code,
                     country: formData.country || 'Türkiye',
                 }),
+                signal: abortController.signal,
             })
                 .then(async (response) => {
+                    // İstek iptal edildiyse işlem yapma
+                    if (abortController.signal.aborted) {
+                        return;
+                    }
+
                     const data = await response.json();
 
                     if (!response.ok) {
@@ -85,19 +116,43 @@ export function CheckoutForm({ formData }: CheckoutFormProps) {
 
                         setCheckoutFormContent(data.data.checkoutFormContent);
                         setCheckoutFormToken(data.data.token || null);
+                        requestCompleted = true;
                     } else {
                         setCheckoutFormError(data.errorMessage || data.message || 'Ödeme formu yüklenemedi');
+                        requestCompleted = true;
                     }
                 })
                 .catch((error) => {
+                    // AbortError'ı görmezden gel
+                    if (error.name === 'AbortError') {
+                        return;
+                    }
                     setCheckoutFormError(error.message || 'Bir hata oluştu');
+                    requestCompleted = true;
                 })
                 .finally(() => {
-                    setCheckoutFormLoading(false);
+                    // İstek tamamlandıysa (başarılı veya hatalı) loading'i false yap
+                    // Abort edilmiş olsa bile, eğer response geldiyse loading'i false yap
+                    if (requestCompleted || !abortController.signal.aborted) {
+                        setCheckoutFormLoading(false);
+                        requestInProgressRef.current = false;
+                    } else {
+                        // İptal edildiyse key'i geri al
+                        requestedKeysRef.current.delete(currentRequestKey);
+                        requestInProgressRef.current = false;
+                    }
                 });
         }
+
+        // Cleanup function - component unmount veya dependency değiştiğinde
+        // Not: Abort etmiyoruz çünkü StrictMode'da component mount -> unmount -> mount döngüsü var
+        // ve istek zaten tamamlanmış olabilir. Abort etmek sadece yeni istek atılırken yapılmalı.
+        return () => {
+            // Cleanup'ta abort etme - sadece ref'i temizle
+            // Abort işlemi sadece yeni istek atılırken yapılacak
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [checkoutFormContent, checkoutFormLoading, checkoutFormError, formData.full_name, formData.email, formData.phone]);
+    }, [checkoutFormContent, formData.full_name, formData.email, formData.phone, initializeEndpoint]);
 
     // Checkout form content yüklendiğinde script'i dinamik olarak ekle
     useEffect(() => {

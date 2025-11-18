@@ -11,15 +11,32 @@ use App\Http\Controllers\Product\ProductController as StoreProductController;
 use App\Http\Controllers\Report\ReportsController;
 use App\Http\Controllers\Service\CardStorageController;
 use App\Http\Controllers\Service\InstallmentBinController;
+use App\Http\Controllers\Service\IyzicoLinkController;
 use App\Http\Controllers\Service\PaymentInquiryController;
 use App\Http\Controllers\Service\ServicesController;
 use App\Http\Controllers\Service\SftpController;
 use App\Http\Controllers\Service\WebhookController;
+use App\Http\Controllers\QuickDemoController;
 use App\Http\Controllers\Store\StoreController;
+use App\Http\Controllers\Subscription\SubscriptionController;
+use App\Http\Controllers\Subscription\SubscriptionPageController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'home'])->name('home');
+Route::get('/demo/{paymentMethod}', [QuickDemoController::class, 'index'])->name('quick-demo');
+
+// Quick Demo Payment Routes
+Route::prefix('demo')->name('demo.')->group(function () {
+    Route::post('/payment/credit-card', [QuickDemoController::class, 'processCreditCardPayment'])->name('payment.credit-card');
+    Route::post('/payment/checkout-form/initialize', [QuickDemoController::class, 'initializeCheckoutForm'])->name('payment.checkout-form.initialize');
+    Route::post('/payment/iyzico/initialize', [QuickDemoController::class, 'initializePayWithIyzico'])->name('payment.iyzico.initialize');
+    Route::post('/payment/installment-options', [QuickDemoController::class, 'getInstallmentOptions'])->name('payment.installment-options');
+
+    // Quick Demo Order Routes
+    Route::get('/orders/success', [QuickDemoController::class, 'success'])->name('orders.success');
+    Route::get('/orders/failed', [QuickDemoController::class, 'failed'])->name('orders.failed');
+});
 
 
 Route::prefix('services')->group(function () {
@@ -30,6 +47,7 @@ Route::prefix('services')->group(function () {
     Route::get('/installment-bin', [InstallmentBinController::class, 'index'])->name('installment-bin.index');
     Route::get('/payment-inquiry', [PaymentInquiryController::class, 'index'])->name('payment-inquiry.index');
     Route::get('/card-storage', [CardStorageController::class, 'index'])->name('card-storage.index');
+    Route::get('/iyzico-link', [IyzicoLinkController::class, 'index'])->name('iyzico-link.index');
 
     // Card Storage API routes
     Route::post('/card-storage/create', [CardStorageController::class, 'createCard'])->name('card-storage.create');
@@ -71,6 +89,50 @@ Route::prefix('services')->group(function () {
         [ReportsController::class, 'marketplacePayoutCompleted'])->name('reports.marketplace-payout-completed');
     Route::get('/reports/marketplace-bounced-payments',
         [ReportsController::class, 'marketplaceRetrieveBouncedPayments'])->name('reports.marketplace-bounced-payments');
+
+    // iyzico Link API routes
+    Route::post('/iyzico-link/create', [IyzicoLinkController::class, 'create'])->name('iyzico-link.create');
+    Route::post('/iyzico-link/fastlink', [IyzicoLinkController::class, 'createFastlink'])->name('iyzico-link.fastlink');
+    Route::post('/iyzico-link/retrieve', [IyzicoLinkController::class, 'retrieve'])->name('iyzico-link.retrieve');
+    Route::post('/iyzico-link/list', [IyzicoLinkController::class, 'list'])->name('iyzico-link.list');
+    Route::post('/iyzico-link/update', [IyzicoLinkController::class, 'update'])->name('iyzico-link.update');
+    Route::post('/iyzico-link/update-status', [IyzicoLinkController::class, 'updateStatus'])->name('iyzico-link.update-status');
+    Route::post('/iyzico-link/delete', [IyzicoLinkController::class, 'delete'])->name('iyzico-link.delete');
+});
+
+// Subscription Routes
+Route::prefix('subscription')->name('subscription.')->group(function () {
+    // Subscription page
+    Route::get('/', [SubscriptionPageController::class, 'index'])->name('index');
+
+    // Ürün işlemleri
+    Route::get('/products', [SubscriptionController::class, 'listProducts'])->name('products.list');
+    Route::post('/products', [SubscriptionController::class, 'createProduct'])->name('products.create');
+    Route::put('/products', [SubscriptionController::class, 'updateProduct'])->name('products.update');
+    Route::delete('/products', [SubscriptionController::class, 'deleteProduct'])->name('products.delete');
+    Route::get('/products/{productReferenceCode}', [SubscriptionController::class, 'retrieveProduct'])->name('products.retrieve');
+
+    // Plan işlemleri
+    Route::get('/plans', [SubscriptionController::class, 'listPaymentPlans'])->name('plans.list');
+    Route::post('/plans', [SubscriptionController::class, 'createPaymentPlan'])->name('plans.create');
+    Route::put('/plans', [SubscriptionController::class, 'updatePaymentPlan'])->name('plans.update');
+    Route::delete('/plans', [SubscriptionController::class, 'deletePaymentPlan'])->name('plans.delete');
+    Route::get('/plans/{pricingPlanReferenceCode}', [SubscriptionController::class, 'retrievePaymentPlan'])->name('plans.retrieve');
+
+    // Abonelik işlemleri
+    Route::get('/subscriptions', [SubscriptionController::class, 'searchSubscription'])->name('subscriptions.search');
+    Route::post('/subscriptions', [SubscriptionController::class, 'createSubscription'])->name('subscriptions.create');
+    Route::post('/subscriptions/activate', [SubscriptionController::class, 'activateSubscription'])->name('subscriptions.activate');
+    Route::post('/subscriptions/retry', [SubscriptionController::class, 'retrySubscription'])->name('subscriptions.retry');
+    Route::post('/subscriptions/upgrade', [SubscriptionController::class, 'upgradeSubscription'])->name('subscriptions.upgrade');
+    Route::post('/subscriptions/cancel', [SubscriptionController::class, 'cancelSubscription'])->name('subscriptions.cancel');
+    Route::put('/subscriptions/card', [SubscriptionController::class, 'updateSubscriptionCard'])->name('subscriptions.update-card');
+    Route::get('/subscriptions/{subscriptionReferenceCode}', [SubscriptionController::class, 'retrieveSubscription'])->name('subscriptions.retrieve');
+
+    // Abone işlemleri
+    Route::get('/customers', [SubscriptionController::class, 'listCustomers'])->name('customers.list');
+    Route::put('/customers', [SubscriptionController::class, 'updateCustomer'])->name('customers.update');
+    Route::get('/customers/{customerReferenceCode}', [SubscriptionController::class, 'retrieveCustomer'])->name('customers.retrieve');
 });
 
 // Store Routes

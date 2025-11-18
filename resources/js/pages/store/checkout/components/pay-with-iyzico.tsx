@@ -22,6 +22,7 @@ interface PayWithIyzicoProps {
     onSubmit?: () => void;
     isSubmitting?: boolean;
     isValid?: boolean;
+    initializeEndpoint?: string;
 }
 
 export function PayWithIyzico({
@@ -29,6 +30,7 @@ export function PayWithIyzico({
     onSubmit,
     isSubmitting = false,
     isValid = false,
+    initializeEndpoint = '/store/payment/iyzico/initialize',
 }: PayWithIyzicoProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -47,7 +49,7 @@ export function PayWithIyzico({
                 .querySelector('meta[name="csrf-token"]')
                 ?.getAttribute('content') || '';
 
-            const response = await fetch('/store/payment/iyzico/initialize', {
+            const response = await fetch(initializeEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -8,6 +8,8 @@ import { Head, Link } from '@inertiajs/react';
 import {
     CreditCard,
     FileText,
+    Link as LinkIcon,
+    Repeat,
     Search,
     Server,
     Wallet,
@@ -81,6 +83,28 @@ export default function ServicesIndex() {
             color: 'text-pink-600 dark:text-pink-400',
             bgColor: 'bg-pink-50 dark:bg-pink-900/20',
             borderColor: 'border-pink-200 dark:border-pink-800',
+        },
+        {
+            id: 'iyzico-link',
+            title: 'iyzico Link',
+            description:
+                'iyzico Link oluşturun, güncelleyin, listeleyin ve yönetin. Link oluşturma, Fastlink, detay görüntüleme, güncelleme, durum değiştirme ve silme işlemleri.',
+            icon: LinkIcon,
+            href: '/services/iyzico-link',
+            color: 'text-cyan-600 dark:text-cyan-400',
+            bgColor: 'bg-cyan-50 dark:bg-cyan-900/20',
+            borderColor: 'border-cyan-200 dark:border-cyan-800',
+        },
+        {
+            id: 'subscription',
+            title: 'Abonelik Yönetimi',
+            description:
+                'iyzico abonelik sistemi ile ürün, plan, abonelik ve abone yönetimi. Ürün ve plan oluşturma, abonelik başlatma, iptal etme ve yönetme işlemleri.',
+            icon: Repeat,
+            href: '/subscription',
+            color: 'text-teal-600 dark:text-teal-400',
+            bgColor: 'bg-teal-50 dark:bg-teal-900/20',
+            borderColor: 'border-teal-200 dark:border-teal-800',
         },
     ];
 

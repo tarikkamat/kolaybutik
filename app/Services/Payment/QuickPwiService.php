@@ -64,7 +64,7 @@ class QuickPwiService
             $request->setCurrency(Currency::TL);
             $request->setBasketId('BASKET_'.time());
             $request->setPaymentGroup(PaymentGroup::PRODUCT);
-            $request->setCallbackUrl(route('store.payment.checkout-form.callback'));
+            $request->setCallbackUrl(route('store.payment.quick-pwi.callback'));
             $request->setEnabledInstallments([2, 3, 6, 9, 12]);
 
             $buyer = new Buyer();
@@ -76,7 +76,7 @@ class QuickPwiService
             $nameParts = explode(' ', $data['full_name'], 2);
             $buyer->setName($nameParts[0] ?? 'Ad');
             $buyer->setSurname($nameParts[1] ?? 'Soyad');
-            $buyer->setGsmNumber($data['phone'] ?? '+905554443322');
+            $buyer->setGsmNumber('+905309720000');
             $buyer->setEmail($data['email'] ?? 'customer@example.com');
             $buyer->setIdentityNumber('11111111111');
             $buyer->setLastLoginDate(date('Y-m-d H:i:s'));
@@ -120,8 +120,23 @@ class QuickPwiService
             }
             $request->setBasketItems($basketItems);
 
-            // Checkout form initialize
+            // Checkout form initialize - performans ölçümü
+            $startTime = microtime(true);
+            Log::info('QuickPwiService: API isteği başlatılıyor', [
+                'conversation_id' => $request->getConversationId(),
+                'price' => $request->getPrice(),
+                'base_url' => $this->options->getBaseUrl(),
+            ]);
+
             $checkoutFormInitialize = CheckoutFormInitialize::create($request, $this->options);
+
+            $endTime = microtime(true);
+            $duration = ($endTime - $startTime) * 1000; // milisaniye cinsinden
+            Log::info('QuickPwiService: API isteği tamamlandı', [
+                'duration_ms' => round($duration, 2),
+                'status' => $checkoutFormInitialize->getStatus(),
+                'conversation_id' => $checkoutFormInitialize->getConversationId(),
+            ]);
 
             if ($checkoutFormInitialize->getStatus() === 'success') {
                 // Session'a bilgileri kaydet
