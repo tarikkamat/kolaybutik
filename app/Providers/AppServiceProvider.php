@@ -43,8 +43,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Production ortamında HTTPS kullanımını zorla
+        // Load balancer arkasında çalışırken, request'in secure olup olmadığını kontrol et
         if ($this->app->environment('production')) {
-            URL::forceScheme('https');
+            // Load balancer'dan gelen X-Forwarded-Proto header'ını kontrol et
+            if (request()->header('X-Forwarded-Proto') === 'https' || request()->secure()) {
+                URL::forceScheme('https');
+            }
         } elseif ($this->app->environment('staging') || request()->secure()) {
             // Staging veya HTTPS üzerinden erişiliyorsa HTTPS kullan
             URL::forceScheme('https');

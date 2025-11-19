@@ -24,7 +24,4 @@ export default defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
-    base: process.env.NODE_ENV === 'production'
-        ? (process.env.ASSET_URL || '/')
-        : '/',
 });
