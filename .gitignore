@@ -10,8 +10,8 @@
 /storage/*.key
 /storage/pail
 /vendor
-.env
 .DS_Store
+.env
 .env.backup
 .env.production
 .phpactor.json
