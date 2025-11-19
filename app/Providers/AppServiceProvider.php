@@ -8,6 +8,7 @@ use App\Repositories\Product\CategoryRepository;
 use App\Repositories\Product\ProductRepository;
 use App\Services\Product\CategoryService;
 use App\Services\Product\ProductService;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -41,6 +42,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Production ortamında HTTPS kullanımını zorla
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        } elseif ($this->app->environment('staging') || request()->secure()) {
+            // Staging veya HTTPS üzerinden erişiliyorsa HTTPS kullan
+            URL::forceScheme('https');
+        }
     }
 }
