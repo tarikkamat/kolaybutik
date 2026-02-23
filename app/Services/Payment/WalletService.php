@@ -80,7 +80,7 @@ class WalletService
             $nameParts = explode(' ', $data['full_name'], 2);
             $buyer->setName($nameParts[0] ?? 'Ad');
             $buyer->setSurname($nameParts[1] ?? 'Soyad');
-            $buyer->setGsmNumber($data['phone'] ?? '+905554443322');
+            $buyer->setGsmNumber("+905546041451"); // TODO:
             $buyer->setEmail($data['email'] ?? 'customer@example.com');
             $buyer->setIdentityNumber('11111111111');
             $buyer->setLastLoginDate(date('Y-m-d H:i:s'));

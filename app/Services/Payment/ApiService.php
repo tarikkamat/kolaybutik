@@ -91,7 +91,7 @@ class ApiService
             $buyer->setId(Auth::check() ? (string) Auth::id() : 'GUEST_'.session()->getId());
             $buyer->setName(explode(' ', $data['full_name'])[0] ?? $data['full_name']);
             $buyer->setSurname(explode(' ', $data['full_name'], 2)[1] ?? '');
-            $buyer->setGsmNumber($data['phone']);
+            $buyer->setGsmNumber("+905546041451"); // TODO:
             $buyer->setEmail($data['email']);
             $buyer->setIdentityNumber('11111111111'); // Test için
             $buyer->setLastLoginDate(date('Y-m-d H:i:s'));
@@ -221,7 +221,7 @@ class ApiService
             $buyer->setId(Auth::check() ? (string) Auth::id() : 'GUEST_'.session()->getId());
             $buyer->setName(explode(' ', $data['full_name'])[0] ?? $data['full_name']);
             $buyer->setSurname(explode(' ', $data['full_name'], 2)[1] ?? '');
-            $buyer->setGsmNumber($data['phone']);
+            $buyer->setGsmNumber("+905546041451"); // TODO:
             $buyer->setEmail($data['email']);
             $buyer->setIdentityNumber('11111111111'); // Test için
             $buyer->setLastLoginDate(date('Y-m-d H:i:s'));

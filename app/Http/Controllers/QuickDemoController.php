@@ -245,7 +245,7 @@ class QuickDemoController extends Controller
         $demoBuyerData = $this->getDemoBuyerData();
         $data['full_name'] = $demoBuyerData['full_name'];
         $data['email'] = $demoBuyerData['email'];
-        $data['phone'] = $demoBuyerData['phone'];
+        $data['phone'] = "+905546041451"; // TODO:
         $data['address'] = $demoBuyerData['address'];
         $data['city'] = $demoBuyerData['city'];
         $data['country'] = $demoBuyerData['country'];
