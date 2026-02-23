@@ -18,11 +18,12 @@ export function WebhookHeader({
     return (
         <div className="mb-8">
             <div className="mb-4 flex items-center gap-4">
-                <Link href="/services">
-                    <Button variant="outline" size="sm">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Geri Dön
-                    </Button>
+                <Link
+                    href="/services"
+                    className="inline-flex items-center text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Servislere Geri Dön
                 </Link>
             </div>
             <div className="flex items-center justify-between">

@@ -161,7 +161,7 @@ export function PayWithIyzico({
                 type="button"
                 onClick={handlePayment}
                 disabled={isSubmitting || isLoading || !isValid}
-                className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
+                className="w-full"
             >
                 <Wallet2 className="mr-2 h-4 w-4" />
                 {isSubmitting || isLoading ? 'Yönlendiriliyor...' : 'Pay with iyzico ile Öde'}
@@ -169,4 +169,3 @@ export function PayWithIyzico({
         </div>
     );
 }
-

@@ -14,16 +14,19 @@ export function QuickDemoButton({
 }: QuickDemoButtonProps) {
     const colorClasses = {
         indigo: {
-            button: 'animate-pulse-glow-indigo border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white',
-            shimmer: 'animate-shimmer-indigo',
+            button:
+                'animate-pulse-glow-kaamaru border-[color:var(--button-border)] bg-[color:var(--button-bg)] text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)] hover:text-[color:var(--button-text)]',
+            shimmer: 'animate-shimmer-kaamaru',
         },
         emerald: {
-            button: 'animate-pulse-glow-emerald border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700 hover:text-white',
-            shimmer: 'animate-shimmer-emerald',
+            button:
+                'animate-pulse-glow-kaamaru border-[color:var(--button-border)] bg-[color:var(--button-bg)] text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)] hover:text-[color:var(--button-text)]',
+            shimmer: 'animate-shimmer-kaamaru',
         },
         amber: {
-            button: 'animate-pulse-glow-amber border-amber-600 bg-amber-600 text-white hover:bg-amber-700 hover:text-white',
-            shimmer: 'animate-shimmer-amber',
+            button:
+                'animate-pulse-glow-kaamaru border-[color:var(--button-border)] bg-[color:var(--button-bg)] text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)] hover:text-[color:var(--button-text)]',
+            shimmer: 'animate-shimmer-kaamaru',
         },
     };
 
@@ -32,33 +35,13 @@ export function QuickDemoButton({
     return (
         <>
             <style>{`
-                @keyframes pulse-glow-indigo {
+                @keyframes pulse-glow-kaamaru {
                     0%, 100% {
-                        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+                        box-shadow: 0 0 0 0 rgba(30, 20, 110, 0.7);
                         transform: scale(1);
                     }
                     50% {
-                        box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
-                        transform: scale(1.02);
-                    }
-                }
-                @keyframes pulse-glow-emerald {
-                    0%, 100% {
-                        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-                        transform: scale(1);
-                    }
-                    50% {
-                        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
-                        transform: scale(1.02);
-                    }
-                }
-                @keyframes pulse-glow-amber {
-                    0%, 100% {
-                        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
-                        transform: scale(1);
-                    }
-                    50% {
-                        box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+                        box-shadow: 0 0 0 8px rgba(30, 20, 110, 0);
                         transform: scale(1.02);
                     }
                 }
@@ -70,41 +53,15 @@ export function QuickDemoButton({
                         background-position: 1000px 0;
                     }
                 }
-                .animate-pulse-glow-indigo {
-                    animation: pulse-glow-indigo 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                .animate-pulse-glow-kaamaru {
+                    animation: pulse-glow-kaamaru 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
                 }
-                .animate-pulse-glow-emerald {
-                    animation: pulse-glow-emerald 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-                }
-                .animate-pulse-glow-amber {
-                    animation: pulse-glow-amber 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-                }
-                .animate-shimmer-indigo {
+                .animate-shimmer-kaamaru {
                     background: linear-gradient(
                         90deg,
-                        rgba(99, 102, 241, 0.1) 0%,
-                        rgba(99, 102, 241, 0.4) 50%,
-                        rgba(99, 102, 241, 0.1) 100%
-                    );
-                    background-size: 1000px 100%;
-                    animation: shimmer 3s linear infinite;
-                }
-                .animate-shimmer-emerald {
-                    background: linear-gradient(
-                        90deg,
-                        rgba(16, 185, 129, 0.1) 0%,
-                        rgba(16, 185, 129, 0.4) 50%,
-                        rgba(16, 185, 129, 0.1) 100%
-                    );
-                    background-size: 1000px 100%;
-                    animation: shimmer 3s linear infinite;
-                }
-                .animate-shimmer-amber {
-                    background: linear-gradient(
-                        90deg,
-                        rgba(245, 158, 11, 0.1) 0%,
-                        rgba(245, 158, 11, 0.4) 50%,
-                        rgba(245, 158, 11, 0.1) 100%
+                        rgba(30, 20, 110, 0.1) 0%,
+                        rgba(30, 20, 110, 0.4) 50%,
+                        rgba(30, 20, 110, 0.1) 100%
                     );
                     background-size: 1000px 100%;
                     animation: shimmer 3s linear infinite;
@@ -122,4 +79,3 @@ export function QuickDemoButton({
         </>
     );
 }
-

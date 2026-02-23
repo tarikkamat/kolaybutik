@@ -2,6 +2,7 @@ export interface OrderSuccessProps {
     orderNumber?: string;
     orderId?: string | number;
     paymentId?: string;
+    paymentMethod?: string;
     paymentData?: any;
 }
 
@@ -13,5 +14,6 @@ export interface OrderFailedProps {
 export interface OrderShowProps {
     orderId: string;
     paymentId?: string;
+    paymentMethod?: string;
     paymentData?: any;
 }

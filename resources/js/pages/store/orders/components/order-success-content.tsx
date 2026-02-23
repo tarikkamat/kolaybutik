@@ -7,6 +7,7 @@ export function OrderSuccessContent({
     orderNumber,
     orderId,
     paymentId,
+    paymentMethod,
     paymentData,
 }: OrderSuccessProps) {
     return (
@@ -41,7 +42,18 @@ export function OrderSuccessContent({
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                 {orderId && (
                     <Link
-                        href={`/store/orders/${orderId}${paymentId ? `?paymentId=${paymentId}` : ''}`}
+                        href={
+                            `/store/orders/${orderId}` +
+                            (paymentId || paymentMethod
+                                ? '?' +
+                                  [
+                                      paymentId && `paymentId=${paymentId}`,
+                                      paymentMethod && `paymentMethod=${paymentMethod}`,
+                                  ]
+                                      .filter(Boolean)
+                                      .join('&')
+                                : '')
+                        }
                     >
                         <Button variant="outline" className="w-full sm:w-auto">
                             <Package className="mr-2 h-4 w-4" />
@@ -50,7 +62,7 @@ export function OrderSuccessContent({
                     </Link>
                 )}
                 <Link href="/store">
-                    <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 sm:w-auto">
+                    <Button className="w-full sm:w-auto">
                         <Home className="mr-2 h-4 w-4" />
                         Mağazaya Dön
                     </Button>

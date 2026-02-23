@@ -118,7 +118,7 @@ export function CreditCardPayment({
                     type="button"
                     onClick={onSubmit}
                     disabled={isSubmitting || !isValid}
-                    className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
+                    className="w-full"
                 >
                     <CreditCard className="mr-2 h-4 w-4" />
                     {isSubmitting ? 'İşleniyor...' : 'Ödeme Yap'}
@@ -127,4 +127,3 @@ export function CreditCardPayment({
         </div>
     );
 }
-

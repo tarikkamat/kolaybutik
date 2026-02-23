@@ -127,7 +127,7 @@ class AlternativePaymentController extends Controller
 
         $result = $this->paymentService->processPayment('quick_pwi', $data);
 
-        return $this->handlePaymentResult($request, $result);
+        return $this->handlePaymentResult($request, $result, false, 'quick_pwi');
     }
 
     /**

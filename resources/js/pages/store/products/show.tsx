@@ -106,7 +106,7 @@ export default function ProductShow({
                                         ₺{product.price.toFixed(2)}
                                     </span>
                                     {discountPercentage > 0 && (
-                                        <span className="rounded-md bg-red-100 px-2 py-1 text-sm font-semibold text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                                        <span className="rounded-md px-2 py-1 text-sm font-semibold chip-success">
                                             %{discountPercentage} İndirim
                                         </span>
                                     )}
@@ -152,7 +152,7 @@ export default function ProductShow({
                             size="lg"
                             disabled={addingToCart.has(product.id)}
                             onClick={() => handleAddToCart(product.id)}
-                            className="w-full bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
+                            className="w-full"
                         >
                             {addingToCart.has(product.id) ? (
                                 <>

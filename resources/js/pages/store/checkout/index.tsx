@@ -420,7 +420,6 @@ export default function CheckoutIndex({
                                                 disabled={
                                                     !validateStep(currentStep)
                                                 }
-                                                className="bg-indigo-600 text-white hover:bg-indigo-700"
                                             >
                                                 İleri
                                             </Button>
@@ -432,7 +431,6 @@ export default function CheckoutIndex({
                                                     isSubmitting ||
                                                     !validateStep(2)
                                                 }
-                                                className="bg-indigo-600 text-white hover:bg-indigo-700"
                                             >
                                                 {isSubmitting
                                                     ? 'İşleniyor...'

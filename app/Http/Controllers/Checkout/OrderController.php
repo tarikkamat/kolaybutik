@@ -24,19 +24,21 @@ class OrderController extends Controller
     {
         $orderId = $request->get('orderId', 'N/A');
         $paymentId = $request->get('paymentId');
+        $paymentMethod = $request->get('paymentMethod');
 
         // Sepeti temizle
         $this->cartService->clearCart();
 
-        // Payment retrieve yap (eğer paymentId varsa)
+        // Payment retrieve: Quick PWI ödemeleri için IYZIPAY_QUICK_PWI_* key'leri kullan
         $paymentData = null;
         if ($paymentId) {
-            $paymentData = $this->paymentInquiryService->retrievePayment($paymentId);
+            $paymentData = $this->retrievePaymentWithCorrectConnection($paymentId, $paymentMethod);
         }
 
         return Inertia::render('store/orders/success', [
             'orderId' => $orderId,
             'paymentId' => $paymentId,
+            'paymentMethod' => $paymentMethod,
             'paymentData' => $paymentData,
         ]);
     }
@@ -47,16 +49,18 @@ class OrderController extends Controller
     public function show(Request $request, string $orderId): Response
     {
         $paymentId = $request->get('paymentId');
+        $paymentMethod = $request->get('paymentMethod');
 
-        // Payment retrieve yap
+        // Payment retrieve: Quick PWI ödemeleri için IYZIPAY_QUICK_PWI_* key'leri kullan
         $paymentData = null;
         if ($paymentId) {
-            $paymentData = $this->paymentInquiryService->retrievePayment($paymentId);
+            $paymentData = $this->retrievePaymentWithCorrectConnection($paymentId, $paymentMethod);
         }
 
         return Inertia::render('store/orders/show', [
             'orderId' => $orderId,
             'paymentId' => $paymentId,
+            'paymentMethod' => $paymentMethod,
             'paymentData' => $paymentData,
         ]);
     }
@@ -73,6 +77,24 @@ class OrderController extends Controller
             'orderId' => $orderId,
             'errorMessage' => $errorMessage,
         ]);
+    }
+
+    /**
+     * Ödeme sorgulamasını doğru API key'leri ile yapar.
+     * paymentMethod yoksa önce quick_pwi dener (store checkout'ta Quick PWI yaygın), bulunamazsa default.
+     */
+    private function retrievePaymentWithCorrectConnection(string $paymentId, ?string $paymentMethod): ?array
+    {
+        if ($paymentMethod === 'quick_pwi') {
+            return $this->paymentInquiryService->retrievePayment($paymentId, null, 'quick_pwi');
+        }
+
+        $result = $this->paymentInquiryService->retrievePayment($paymentId, null, 'quick_pwi');
+        if ($result && ($result['status'] ?? '') === 'success') {
+            return $result;
+        }
+
+        return $this->paymentInquiryService->retrievePayment($paymentId, null, 'default');
     }
 }
 

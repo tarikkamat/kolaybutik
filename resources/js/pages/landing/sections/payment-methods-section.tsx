@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { QuickDemoButton } from '@/components/quick-demo-button';
 import { Code, CreditCard, ExternalLink, Lock } from 'lucide-react';
 
@@ -23,102 +23,114 @@ export default function PaymentMethodsSection() {
                     {/* API to API */}
                     <Card className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
                         <CardHeader>
-                            <div className="mb-4 inline-flex rounded-lg bg-indigo-100 p-3 dark:bg-indigo-950">
-                                <Code className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                            <div className="mb-4 inline-flex items-center rounded-lg bg-[color:var(--iyzico-denim)]/10 p-3 dark:bg-[color:var(--iyzico-denim)]/20">
+                                <Code className="h-6 w-6 !text-[color:var(--iyzico-denim)]" />
+                                <div className="ms-2 font-semibold leading-none !text-[color:var(--iyzico-denim)]">
+                                    iyzico Sanal POS
+                                </div>
                             </div>
-                            <CardTitle className="text-slate-900 dark:text-white">
-                                API to API Entegrasyon
-                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p className="mb-4 text-slate-600 dark:text-slate-400">
-                                Doğrudan API entegrasyonu ile tam kontrol.
-                                Non-3DS ve 3DS ödeme işlemlerini kendi
-                                sisteminizden yönetin.
+                                Sanal POS ile kredi kartı, banka kartı
+                                ödemelerini kendi ekranlarınızdan yönetin.
+                                Non-3DS ve 3DS işlemlerde tam kontrol sizde
+                                olsun.
                             </p>
                             <ul className="mb-6 space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li className="flex items-center gap-2">
-                                    <Lock className="h-4 w-4 text-emerald-600" />
-                                    <span>Non-3DS desteği</span>
+                                    <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
+                                    <span>Doğrudan API yönetimi</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Lock className="h-4 w-4 text-emerald-600" />
-                                    <span>3DS desteği</span>
+                                    <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
+                                    <span>Non-3DS & 3DS desteği</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Lock className="h-4 w-4 text-emerald-600" />
-                                    <span>Tam kontrol</span>
+                                    <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
+                                    <span>Kart saklama</span>
                                 </li>
                             </ul>
-                            <QuickDemoButton href="/demo/credit-card" color="indigo" />
+                            <QuickDemoButton href="/demo/credit-card" color="indigo">
+                                Hemen Dene
+                            </QuickDemoButton>
                         </CardContent>
                     </Card>
 
                     {/* Checkout Form */}
                     <Card className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
                         <CardHeader>
-                            <div className="mb-4 inline-flex rounded-lg bg-emerald-100 p-3 dark:bg-emerald-950">
-                                <CreditCard className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                            <div className="mb-4 inline-flex items-center rounded-lg bg-[color:var(--iyzico-bittersweet)]/10 p-3 dark:bg-[color:var(--iyzico-bittersweet)]/20">
+                                <CreditCard className="h-6 w-6 !text-[color:var(--iyzico-bittersweet)]" />
+                                <div className="ms-2 font-semibold leading-none !text-[color:var(--iyzico-bittersweet)]">
+                                    iyzico Checkout Form
+                                </div>
                             </div>
-                            <CardTitle className="text-slate-900 dark:text-white">
-                                Checkout Form iFrame
-                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p className="mb-4 text-slate-600 dark:text-slate-400">
-                                iFrame tabanlı ödeme formu ile hızlı
-                                entegrasyon. PCI DSS yükümlülüklerinden muaf
-                                kalın.
+                                Kart ile ödeme ve iyzico ile Öde seçeneklerini
+                                tek ekran üzerinden sunun, PCI DSS
+                                yükümlülüklerinden muaf olun. Kullanıcı ister
+                                kart bilgilerini form üzerinden girsin, ister
+                                iyzico ile Öde akışına yönlendirilsin.
                             </p>
                             <ul className="mb-6 space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li className="flex items-center gap-2">
-                                    <Lock className="h-4 w-4 text-emerald-600" />
+                                    <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
                                     <span>Hızlı kurulum</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Lock className="h-4 w-4 text-emerald-600" />
-                                    <span>PCI DSS uyumlu</span>
+                                    <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
+                                    <span>
+                                        Tek ekranda birden fazla ödeme seçeneği
+                                    </span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Lock className="h-4 w-4 text-emerald-600" />
-                                    <span>Özelleştirilebilir</span>
+                                    <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
+                                    <span>PCI DSS uyumlu</span>
                                 </li>
                             </ul>
-                            <QuickDemoButton href="/demo/checkout-form" color="emerald" />
+                            <QuickDemoButton href="/demo/checkout-form" color="emerald">
+                                Hemen Dene
+                            </QuickDemoButton>
                         </CardContent>
                     </Card>
 
                     {/* Pay with iyzico */}
                     <Card className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
                         <CardHeader>
-                            <div className="mb-4 inline-flex rounded-lg bg-amber-100 p-3 dark:bg-amber-950">
-                                <ExternalLink className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                            <div className="mb-4 inline-flex items-center rounded-lg bg-[color:var(--kaamaru)]/10 p-3 dark:bg-[color:var(--kaamaru)]/20">
+                                <ExternalLink className="h-6 w-6 !text-[color:var(--kaamaru)]" />
+                                <div className="ms-2 font-semibold leading-none !text-[color:var(--kaamaru)]">
+                                    iyzico ile Öde
+                                </div>
                             </div>
-                            <CardTitle className="text-slate-900 dark:text-white">
-                                Pay with iyzico
-                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p className="mb-4 text-slate-600 dark:text-slate-400">
-                                iyzico'nun hazır ödeme sayfasına yönlendirme ile
-                                en hızlı entegrasyon. Minimum kod ile maksimum
-                                sonuç.
+                                Hazır ödeme formumuzu sitenize kolayca entegre
+                                edin. Kullanıcı kart bilgilerini girebilir veya
+                                kayıtlı kartları ve mevcut bakiyeleri ile hızlı
+                                ödeme yapabilir.
                             </p>
                             <ul className="mb-6 space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li className="flex items-center gap-2">
-                                    <Lock className="h-4 w-4 text-emerald-600" />
-                                    <span>Minimum kod</span>
+                                    <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
+                                    <span>Minimum geliştirme ile hızlı entegrasyon</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Lock className="h-4 w-4 text-emerald-600" />
-                                    <span>Hazır çözüm</span>
+                                    <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
+                                    <span>Hazır iyzico ile Öde akışı</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <Lock className="h-4 w-4 text-emerald-600" />
-                                    <span>Hızlı entegrasyon</span>
+                                    <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
+                                    <span>Alternatif ödeme yöntemleri</span>
                                 </li>
                             </ul>
-                            <QuickDemoButton href="/demo/pay-with-iyzico" color="amber" />
+                            <QuickDemoButton href="/demo/pay-with-iyzico" color="amber">
+                                Hemen Dene
+                            </QuickDemoButton>
                         </CardContent>
                     </Card>
                 </div>

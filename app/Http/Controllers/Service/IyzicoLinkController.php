@@ -21,7 +21,7 @@ class IyzicoLinkController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('services/iyzico-link');
+        return Inertia::render('services/iyzico-link/index');
     }
 
     /**
@@ -42,7 +42,14 @@ class IyzicoLinkController extends Controller
             'stockCount' => 'nullable|integer|min:0',
             'imagePath' => 'nullable|string',
             'base64EncodedImage' => 'nullable|string',
+            'encodedImageFile' => 'nullable|string', // Frontend'den gelen alan adı
         ]);
+
+        // Frontend'den gelen encodedImageFile'ı base64EncodedImage'a map et
+        if (isset($data['encodedImageFile']) && !isset($data['base64EncodedImage'])) {
+            $data['base64EncodedImage'] = $data['encodedImageFile'];
+        }
+        unset($data['encodedImageFile']);
 
         $result = $this->iyzicoLinkService->createIyziLink($data);
 

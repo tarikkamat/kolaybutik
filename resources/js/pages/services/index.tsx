@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import {
     Card,
     CardDescription,
@@ -6,9 +7,11 @@ import {
 } from '@/components/ui/card';
 import { Head, Link } from '@inertiajs/react';
 import {
+    ArrowLeft,
     CreditCard,
     FileText,
     Link as LinkIcon,
+    MessageCircle,
     Repeat,
     Search,
     Server,
@@ -28,6 +31,7 @@ export default function ServicesIndex() {
             color: 'text-indigo-600 dark:text-indigo-400',
             bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
             borderColor: 'border-indigo-200 dark:border-indigo-800',
+            comingSoon: true,
         },
         {
             id: 'sftp',
@@ -39,6 +43,7 @@ export default function ServicesIndex() {
             color: 'text-green-600 dark:text-green-400',
             bgColor: 'bg-green-50 dark:bg-green-900/20',
             borderColor: 'border-green-200 dark:border-green-800',
+            comingSoon: true,
         },
         {
             id: 'reports',
@@ -50,6 +55,7 @@ export default function ServicesIndex() {
             color: 'text-blue-600 dark:text-blue-400',
             bgColor: 'bg-blue-50 dark:bg-blue-900/20',
             borderColor: 'border-blue-200 dark:border-blue-800',
+            comingSoon: true,
         },
         {
             id: 'installment-bin',
@@ -61,6 +67,7 @@ export default function ServicesIndex() {
             color: 'text-purple-600 dark:text-purple-400',
             bgColor: 'bg-purple-50 dark:bg-purple-900/20',
             borderColor: 'border-purple-200 dark:border-purple-800',
+            comingSoon: true,
         },
         {
             id: 'payment-inquiry',
@@ -83,6 +90,7 @@ export default function ServicesIndex() {
             color: 'text-pink-600 dark:text-pink-400',
             bgColor: 'bg-pink-50 dark:bg-pink-900/20',
             borderColor: 'border-pink-200 dark:border-pink-800',
+            comingSoon: true,
         },
         {
             id: 'iyzico-link',
@@ -105,7 +113,8 @@ export default function ServicesIndex() {
             color: 'text-teal-600 dark:text-teal-400',
             bgColor: 'bg-teal-50 dark:bg-teal-900/20',
             borderColor: 'border-teal-200 dark:border-teal-800',
-        },
+            comingSoon: true,
+        }
     ];
 
     return (
@@ -115,6 +124,13 @@ export default function ServicesIndex() {
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-8">
+                    <Link
+                        href="/"
+                        className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                    >
+                        <ArrowLeft className="h-4 w-4" />
+                        Ana sayfaya geri dön
+                    </Link>
                     <h1 className="mb-2 text-3xl font-bold text-slate-900 dark:text-white">
                         Servisler
                     </h1>
@@ -127,31 +143,44 @@ export default function ServicesIndex() {
                 <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     {services.map((service) => {
                         const Icon = service.icon;
+                        const isComingSoon = !!(service as { comingSoon?: boolean }).comingSoon;
+                        const cardContent = (
+                            <CardHeader className="pb-4">
+                                {isComingSoon && (
+                                    <Badge
+                                        variant="secondary"
+                                        className="absolute right-4 top-4"
+                                    >
+                                        Çok Yakında
+                                    </Badge>
+                                )}
+                                <div
+                                    className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${service.bgColor} mb-4 transition-transform duration-200 ${!isComingSoon && 'group-hover:scale-110'}`}
+                                >
+                                    <Icon
+                                        className={`h-7 w-7 ${service.color}`}
+                                    />
+                                </div>
+                                <CardTitle className={`mb-2 text-xl font-semibold text-slate-900 dark:text-white ${!isComingSoon && 'transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400'}`}>
+                                    {service.title}
+                                </CardTitle>
+                                <CardDescription className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                    {service.description}
+                                </CardDescription>
+                            </CardHeader>
+                        );
                         return (
                             <Card
                                 key={service.id}
-                                className={`group relative overflow-hidden border-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl ${service.borderColor} bg-white dark:bg-slate-800`}
+                                className={`group relative overflow-hidden border-2 bg-white dark:bg-slate-800 ${service.borderColor} ${isComingSoon ? 'cursor-default opacity-90' : 'transition-all duration-200 hover:scale-[1.02] hover:shadow-xl'}`}
                             >
-                                <Link
-                                    href={service.href}
-                                    className="block h-full"
-                                >
-                                    <CardHeader className="pb-4">
-                                        <div
-                                            className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${service.bgColor} mb-4 transition-transform duration-200 group-hover:scale-110`}
-                                        >
-                                            <Icon
-                                                className={`h-7 w-7 ${service.color}`}
-                                            />
-                                        </div>
-                                        <CardTitle className="mb-2 text-xl font-semibold text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
-                                            {service.title}
-                                        </CardTitle>
-                                        <CardDescription className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                                            {service.description}
-                                        </CardDescription>
-                                    </CardHeader>
-                                </Link>
+                                {isComingSoon ? (
+                                    <div className="block h-full">{cardContent}</div>
+                                ) : (
+                                    <Link href={service.href} className="block h-full">
+                                        {cardContent}
+                                    </Link>
+                                )}
                             </Card>
                         );
                     })}

@@ -34,8 +34,8 @@ export function WebhookCard({
                         <span
                             className={`rounded-full px-3 py-1 text-xs font-semibold ${
                                 webhook.method === 'POST'
-                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                                    ? 'chip-success'
+                                    : 'chip-error'
                             }`}
                         >
                             {webhook.method}

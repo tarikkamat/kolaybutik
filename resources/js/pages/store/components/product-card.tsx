@@ -36,7 +36,6 @@ export function ProductCard({
                                     e.stopPropagation();
                                     onAddToCart(product.id);
                                 }}
-                                className="bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
                             >
                                 {isAddingToCart ? (
                                     <>

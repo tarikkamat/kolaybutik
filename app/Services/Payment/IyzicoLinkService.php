@@ -2,6 +2,7 @@
 
 namespace App\Services\Payment;
 
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Iyzipay\FileBase64Encoder;
 use Iyzipay\Model\Currency;
@@ -56,27 +57,39 @@ class IyzicoLinkService
             $request->setStockEnabled($data['stockEnabled'] ?? false);
             $request->setStockCount($data['stockCount'] ?? null);
 
-            // Base64 encoded image
+            // Base64 encoded image - zorunlu alan
             if (isset($data['imagePath']) && file_exists($data['imagePath'])) {
                 $request->setBase64EncodedImage(FileBase64Encoder::encode($data['imagePath']));
-            } elseif (isset($data['base64EncodedImage'])) {
+            } elseif (isset($data['base64EncodedImage']) && !empty($data['base64EncodedImage'])) {
                 $request->setBase64EncodedImage($data['base64EncodedImage']);
+            } else {
+                // Resim yoksa hata döndür
+                return [
+                    'status' => 'error',
+                    'success' => false,
+                    'errorMessage' => 'Ürün resmi eklenmesi zorunludur',
+                    'errorCode' => '150109',
+                ];
             }
 
             $iyziLink = IyziLinkSaveProduct::create($request, $this->options);
 
             if ($iyziLink->getStatus() === 'success') {
+                // Response nesnesinden JSON al ve parse et
+                $responseJson = json_decode($iyziLink->getRawResult(), true);
+                $responseData = $responseJson['data'] ?? [];
+
                 return [
                     'status' => 'success',
                     'success' => true,
                     'data' => [
-                        'token' => $iyziLink->getToken(),
-                        'url' => $iyziLink->getUrl(),
-                        'imageUrl' => $iyziLink->getImageUrl(),
-                        'name' => $iyziLink->getName(),
-                        'description' => $iyziLink->getDescription(),
-                        'price' => $iyziLink->getPrice(),
-                        'currency' => $iyziLink->getCurrency(),
+                        'token' => $responseData['token'] ?? null,
+                        'url' => $responseData['url'] ?? null,
+                        'imageUrl' => $responseData['imageUrl'] ?? null,
+                        'name' => $data['name'] ?? 'Ödeme Linki',
+                        'description' => $data['description'] ?? '',
+                        'price' => $data['price'] ?? 0,
+                        'currency' => $data['currency'] ?? Currency::TL,
                         'status' => $iyziLink->getStatus(),
                     ],
                     'message' => 'iyzico Link başarıyla oluşturuldu',
@@ -89,7 +102,7 @@ class IyzicoLinkService
                     'errorCode' => $iyziLink->getErrorCode(),
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('IyzicoLinkService: Create failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -124,16 +137,20 @@ class IyzicoLinkService
             $iyziLink = IyziLinkFastLink::create($request, $this->options);
 
             if ($iyziLink->getStatus() === 'success') {
+                // Response nesnesinden JSON al ve parse et
+                $responseJson = json_decode($iyziLink->getRawResult(), true);
+                $responseData = $responseJson['data'] ?? [];
+
                 return [
                     'status' => 'success',
                     'success' => true,
                     'data' => [
-                        'token' => $iyziLink->getToken(),
-                        'url' => $iyziLink->getUrl(),
-                        'imageUrl' => $iyziLink->getImageUrl(),
-                        'description' => $iyziLink->getDescription(),
-                        'price' => $iyziLink->getPrice(),
-                        'currencyCode' => $iyziLink->getCurrencyCode(),
+                        'token' => $responseData['token'] ?? null,
+                        'url' => $responseData['url'] ?? null,
+                        'imageUrl' => $responseData['imageUrl'] ?? null,
+                        'description' => $data['description'] ?? 'Hızlı Ödeme Linki',
+                        'price' => $data['price'] ?? 0,
+                        'currencyCode' => $data['currencyCode'] ?? 'TRY',
                         'status' => $iyziLink->getStatus(),
                     ],
                     'message' => 'Fastlink başarıyla oluşturuldu',
@@ -146,7 +163,7 @@ class IyzicoLinkService
                     'errorCode' => $iyziLink->getErrorCode(),
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('IyzicoLinkService: Create Fastlink failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -177,20 +194,24 @@ class IyzicoLinkService
             $iyziLink = IyziLinkRetrieveProduct::create($request, $this->options, $token);
 
             if ($iyziLink->getStatus() === 'success') {
+                // Response nesnesinden JSON al ve parse et
+                $responseJson = json_decode($iyziLink->getRawResult(), true);
+                $responseData = $responseJson['data'] ?? [];
+
                 return [
                     'status' => 'success',
                     'success' => true,
                     'data' => [
-                        'token' => $iyziLink->getToken(),
-                        'url' => $iyziLink->getUrl(),
-                        'imageUrl' => $iyziLink->getImageUrl(),
-                        'name' => $iyziLink->getName(),
-                        'description' => $iyziLink->getDescription(),
-                        'price' => $iyziLink->getPrice(),
-                        'currency' => $iyziLink->getCurrency(),
+                        'token' => $responseData['token'] ?? null,
+                        'url' => $responseData['url'] ?? null,
+                        'imageUrl' => $responseData['imageUrl'] ?? null,
+                        'name' => $responseData['name'] ?? null,
+                        'description' => $responseData['description'] ?? null,
+                        'price' => $responseData['price'] ?? null,
+                        'currency' => $responseData['currency'] ?? null,
                         'status' => $iyziLink->getStatus(),
-                        'createdDate' => $iyziLink->getCreatedDate(),
-                        'updatedDate' => $iyziLink->getUpdatedDate(),
+                        'createdDate' => $responseData['createdDate'] ?? null,
+                        'updatedDate' => $responseData['updatedDate'] ?? null,
                     ],
                     'message' => 'iyzico Link detayları başarıyla alındı',
                 ];
@@ -202,7 +223,7 @@ class IyzicoLinkService
                     'errorCode' => $iyziLink->getErrorCode(),
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('IyzicoLinkService: Retrieve failed', [
                 'error' => $e->getMessage(),
                 'token' => $token,
@@ -236,20 +257,24 @@ class IyzicoLinkService
             $iyziLinkList = IyziLinkRetrieveAllProduct::create($request, $this->options);
 
             if ($iyziLinkList->getStatus() === 'success') {
+                // Response nesnesinden JSON al ve parse et
+                $responseJson = json_decode($iyziLinkList->getRawResult(), true);
+                $responseData = $responseJson['data'] ?? [];
+                $items = $responseData['items'] ?? [];
+
                 $links = [];
-                $items = $iyziLinkList->getItems() ?? [];
                 foreach ($items as $product) {
                     $links[] = [
-                        'token' => $product->getToken(),
-                        'url' => $product->getUrl(),
-                        'imageUrl' => $product->getImageUrl(),
-                        'name' => $product->getName(),
-                        'description' => $product->getDescription(),
-                        'price' => $product->getPrice(),
-                        'currency' => $product->getCurrency(),
-                        'status' => $product->getStatus(),
-                        'createdDate' => $product->getCreatedDate(),
-                        'updatedDate' => $product->getUpdatedDate(),
+                        'token' => $product['token'] ?? null,
+                        'url' => $product['url'] ?? null,
+                        'imageUrl' => $product['imageUrl'] ?? null,
+                        'name' => $product['name'] ?? null,
+                        'description' => $product['description'] ?? null,
+                        'price' => $product['price'] ?? null,
+                        'currency' => $product['currency'] ?? null,
+                        'status' => $product['status'] ?? null,
+                        'createdDate' => $product['createdDate'] ?? null,
+                        'updatedDate' => $product['updatedDate'] ?? null,
                     ];
                 }
 
@@ -258,8 +283,8 @@ class IyzicoLinkService
                     'success' => true,
                     'data' => [
                         'links' => $links,
-                        'currentPage' => $iyziLinkList->getCurrentPage(),
-                        'totalCount' => $iyziLinkList->getTotalCount(),
+                        'currentPage' => $responseData['currentPage'] ?? 1,
+                        'totalCount' => $responseData['totalCount'] ?? 0,
                     ],
                     'message' => 'iyzico Link listesi başarıyla alındı',
                 ];
@@ -271,7 +296,7 @@ class IyzicoLinkService
                     'errorCode' => $iyziLinkList->getErrorCode(),
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('IyzicoLinkService: List failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -341,17 +366,21 @@ class IyzicoLinkService
             $iyziLink = IyziLinkUpdateProduct::create($request, $this->options, $token);
 
             if ($iyziLink->getStatus() === 'success') {
+                // Response nesnesinden JSON al ve parse et
+                $responseJson = json_decode($iyziLink->getRawResult(), true);
+                $responseData = $responseJson['data'] ?? [];
+
                 return [
                     'status' => 'success',
                     'success' => true,
                     'data' => [
-                        'token' => $iyziLink->getToken(),
-                        'url' => $iyziLink->getUrl(),
-                        'imageUrl' => $iyziLink->getImageUrl(),
-                        'name' => $iyziLink->getName(),
-                        'description' => $iyziLink->getDescription(),
-                        'price' => $iyziLink->getPrice(),
-                        'currency' => $iyziLink->getCurrency(),
+                        'token' => $responseData['token'] ?? $token,
+                        'url' => $responseData['url'] ?? null,
+                        'imageUrl' => $responseData['imageUrl'] ?? null,
+                        'name' => $data['name'] ?? null,
+                        'description' => $data['description'] ?? null,
+                        'price' => $data['price'] ?? null,
+                        'currency' => $data['currency'] ?? null,
                         'status' => $iyziLink->getStatus(),
                     ],
                     'message' => 'iyzico Link başarıyla güncellendi',
@@ -364,7 +393,7 @@ class IyzicoLinkService
                     'errorCode' => $iyziLink->getErrorCode(),
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('IyzicoLinkService: Update failed', [
                 'error' => $e->getMessage(),
                 'token' => $token,
@@ -416,7 +445,7 @@ class IyzicoLinkService
                     'errorCode' => $iyziLink->getErrorCode(),
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('IyzicoLinkService: Update status failed', [
                 'error' => $e->getMessage(),
                 'token' => $token,
@@ -462,7 +491,7 @@ class IyzicoLinkService
                     'errorCode' => $iyziLink->getErrorCode(),
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('IyzicoLinkService: Delete failed', [
                 'error' => $e->getMessage(),
                 'token' => $token,

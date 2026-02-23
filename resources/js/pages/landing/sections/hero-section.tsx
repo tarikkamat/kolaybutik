@@ -29,20 +29,18 @@ export default function HeroSection() {
                     <div className="text-center lg:text-left">
                         <Badge
                             variant="secondary"
-                            className="mb-4 bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
+                            className="mb-4 chip-success"
                         >
                             iyzico Entegrasyon Çözümleri
                         </Badge>
-                        <h1 className="mb-6 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white">
-                            iyzico ile{' '}
-                            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                                Ödeme Entegrasyonu
-                            </span>
+                        <h1 className="mb-6 text-4xl font-bold tracking-tight text-[color:var(--iyzico-denim)] sm:text-5xl lg:text-6xl">
+                            iyzico ile Ödeme Almanın En Kolay Yolu
                         </h1>
                         <p className="mb-8 text-lg text-slate-600 dark:text-slate-400">
-                            API to API, Checkout Form, Pay with iyzico ve daha
-                            fazlası. Online ödeme, pazaryeri, abonelik ve
-                            korumalı havale EFT çözümleriyle işinizi büyütün.
+                            iyzico Sanal POS, iyzico checkout form veya iyzico
+                            ile Öde arasından işletmenize en uygun entegrasyon
+                            yöntemini seçin. Kredi kartı, banka kartı ve dijital
+                            cüzdan ile ödemelerinizi kolay ve güvenli alın.
                         </p>
                         <div className="flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
                             <a
@@ -52,7 +50,6 @@ export default function HeroSection() {
                             >
                                 <Button
                                     size="lg"
-                                    className="bg-indigo-600 hover:bg-indigo-700"
                                 >
                                     Dokümantasyonu İncele
                                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -69,12 +66,14 @@ export default function HeroSection() {
                                     <DropdownMenuItem asChild>
                                         <Link href="/store">Test Mağaza</Link>
                                     </DropdownMenuItem>
+                                    {/** TODO:
                                     <DropdownMenuItem asChild>
                                         <Link href="/subscription">Test Abonelik</Link>
-                                    </DropdownMenuItem>
+                                    </DropdownMenuItem>  */}
                                     <DropdownMenuItem asChild>
                                         <Link href="/services/iyzico-link">Test iyziLink</Link>
                                     </DropdownMenuItem>
+
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
@@ -97,45 +96,55 @@ export default function HeroSection() {
                         <div className="absolute -inset-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 opacity-20 blur-2xl" />
                         <div className="relative rounded-2xl bg-white p-8 shadow-2xl dark:bg-slate-800">
                             <div className="space-y-4">
-                                <div className="flex items-center gap-4 rounded-lg bg-indigo-50 p-4 dark:bg-indigo-950">
-                                    <div className="rounded-lg bg-indigo-600 p-3">
+                                <div className="flex items-center gap-4 rounded-lg bg-slate-50 p-4 dark:bg-slate-900/50">
+                                    <div className="rounded-lg bg-[color:var(--iyzico-denim)] p-3">
                                         <CreditCard className="h-6 w-6 text-white" />
                                     </div>
                                     <div>
-                                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                            API to API Entegrasyon
+                                        <div className="text-sm font-semibold text-[color:var(--iyzico-denim)]">
+                                            iyzico Sanal POS
                                         </div>
                                         <div className="text-xs text-slate-600 dark:text-slate-400">
-                                            Doğrudan API entegrasyonu ile tam
-                                            kontrol ve Non-3DS/3DS desteği.
+                                            Sanal POS’a doğrudan API üzerinden
+                                            entegre olun. Kartlı ödemelerde
+                                            Non-3DS ve 3DS işlemler için tam
+                                            kontrol sağlayın.
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 rounded-lg bg-emerald-50 p-4 dark:bg-emerald-950">
-                                    <div className="rounded-lg bg-emerald-600 p-3">
+                                <div className="flex items-center gap-4 rounded-lg bg-slate-50 p-4 dark:bg-slate-900/50">
+                                    <div className="rounded-lg bg-[color:var(--iyzico-bittersweet)] p-3">
                                         <AppWindow className="h-6 w-6 text-white" />
                                     </div>
                                     <div>
-                                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                            Checkout Form
+                                        <div className="text-sm font-semibold text-[color:var(--iyzico-bittersweet)]">
+                                            iyzico Checkout Form
                                         </div>
                                         <div className="text-xs text-slate-600 dark:text-slate-400">
-                                            iFrame tabanlı ödeme formu ile PCI
-                                            DSS yükümlülüğünden muaf kalın.
+                                            Kart ve iyzico ile Öde seçeneklerini
+                                            tek ekranda sunun. PCI DSS
+                                            yükümlülüklerinden muaf olun, tek
+                                            bir servis entegrasyonu ile hızlı
+                                            bir şekilde şekilde ödeme almaya
+                                            başlayın.
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 rounded-lg bg-amber-50 p-4 dark:bg-amber-950">
-                                    <div className="rounded-lg bg-amber-600 p-3">
+                                <div className="flex items-center gap-4 rounded-lg bg-slate-50 p-4 dark:bg-slate-900/50">
+                                    <div className="rounded-lg bg-[color:var(--kaamaru)] p-3">
                                         <Wallet className="h-6 w-6 text-white" />
                                     </div>
                                     <div>
-                                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                            Pay with iyzico
+                                        <div className="text-sm font-semibold text-[color:var(--kaamaru)]">
+                                            iyzico ile Öde
                                         </div>
                                         <div className="text-xs text-slate-600 dark:text-slate-400">
-                                            Kayıtlı kartlar ve bakiye ile tek
-                                            tıkla hızlı ödeme çözümü.
+                                            Hazır ödeme formumuzu sitenize
+                                            kolayca ekleyin. Minimum geliştirme
+                                            ile daha hızlı ödeme sağlayın.
+                                            Kullanıcının bakiyesi ile, kayıtlı
+                                            kartı ile, havale eft çözümünü tek
+                                            ekranda sunun.
                                         </div>
                                     </div>
                                 </div>

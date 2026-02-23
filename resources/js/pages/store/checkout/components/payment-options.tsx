@@ -79,14 +79,17 @@ export function PaymentOptions({
             description: 'Hızlı ödeme ile devam edin',
             showPayButton: false,
         },
-        {
+    ];
+
+    /** TODO:
+     *         {
             id: 'saved_card' as PaymentMethod,
             title: 'Saklı Kart ile Ödeme',
             icon: Save,
             description: 'Daha önce kaydettiğiniz kartı kullanın',
             showPayButton: true,
         },
-    ];
+     */
 
     return (
         <div>

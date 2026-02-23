@@ -44,7 +44,7 @@ export default function QuickDemoFailed({
 
                         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                             <Link href="/demo/credit-card">
-                                <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 sm:w-auto">
+                                <Button className="w-full sm:w-auto">
                                     <RefreshCw className="mr-2 h-4 w-4" />
                                     Tekrar Dene
                                 </Button>
@@ -62,4 +62,3 @@ export default function QuickDemoFailed({
         </>
     );
 }
-

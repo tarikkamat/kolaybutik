@@ -2,6 +2,7 @@ import LandingLayout from '@/layouts/landing-layout';
 import AdditionalServicesSection from '@/pages/landing/sections/additional-services-section';
 import ClientLibrariesSection from '@/pages/landing/sections/client-libraries-section';
 import { FaqSection } from '@/pages/landing/sections/faq-section';
+import HowItWorksSection from '@/pages/landing/sections/how-it-works-section';
 import HeroSection from '@/pages/landing/sections/hero-section';
 import PaymentMethodsSection from '@/pages/landing/sections/payment-methods-section';
 import ProductsSection from '@/pages/landing/sections/products-section';
@@ -23,9 +24,6 @@ export default function Home() {
 
                 {/* Additional Services Section */}
                 <AdditionalServicesSection />
-
-                {/* How It Works Section */}
-                {/* <HowItWorksSection /> */}
 
                 {/* Client Libraries Section */}
                 <ClientLibrariesSection />

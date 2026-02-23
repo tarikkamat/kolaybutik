@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { AlertTriangle, ShoppingCart } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import ChatbotSidebar from '@/components/chatbot/chatbot-sidebar';
 
 interface StoreLayoutProps {
     title: string;
@@ -82,6 +83,9 @@ export default function StoreLayout({ title, children }: StoreLayoutProps) {
 
                 {/* Main Content */}
                 <main className="flex-1 pt-24">{children}</main>
+
+                {/* Chatbot Sidebar
+                <ChatbotSidebar /> */}
 
                 {/* Footer */}
                 <footer className="border-t border-slate-200 bg-white px-4 py-12 dark:border-slate-800 dark:bg-slate-900">

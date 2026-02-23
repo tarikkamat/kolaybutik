@@ -9,14 +9,27 @@ use Iyzipay\Request\RetrievePaymentRequest;
 
 class PaymentInquiryService
 {
-    private Options $options;
-
-    public function __construct()
+    /**
+     * Build iyzipay Options for the given connection.
+     * Use 'quick_pwi' for Quick Pay with iyzico payments (checkout).
+     *
+     * @param  string  $connection  'default' or 'quick_pwi'
+     */
+    private function getOptions(string $connection = 'default'): Options
     {
-        $this->options = new Options();
-        $this->options->setApiKey(config('iyzipay.api_key'));
-        $this->options->setSecretKey(config('iyzipay.secret_key'));
-        $this->options->setBaseUrl(config('iyzipay.base_url'));
+        $options = new Options();
+        if ($connection === 'quick_pwi') {
+            $config = config('iyzipay.quick_pwi');
+            $options->setApiKey($config['api_key']);
+            $options->setSecretKey($config['secret_key']);
+            $options->setBaseUrl($config['base_url']);
+        } else {
+            $options->setApiKey(config('iyzipay.api_key'));
+            $options->setSecretKey(config('iyzipay.secret_key'));
+            $options->setBaseUrl(config('iyzipay.base_url'));
+        }
+
+        return $options;
     }
 
     /**
@@ -24,17 +37,19 @@ class PaymentInquiryService
      *
      * @param  string  $paymentId
      * @param  string|null  $conversationId
+     * @param  string  $connection  'default' or 'quick_pwi' (use quick_pwi for Quick Pay with iyzico checkout payments)
      * @return array|null
      */
-    public function retrievePayment(string $paymentId, ?string $conversationId = null): ?array
+    public function retrievePayment(string $paymentId, ?string $conversationId = null, string $connection = 'default'): ?array
     {
         try {
+            $options = $this->getOptions($connection);
             $request = new RetrievePaymentRequest();
             $request->setLocale(Locale::TR);
             $request->setConversationId($conversationId ?? uniqid('conv_', true));
             $request->setPaymentId($paymentId);
 
-            $payment = Payment::retrieve($request, $this->options);
+            $payment = Payment::retrieve($request, $options);
 
             if ($payment->getStatus() === 'success') {
                 $paymentItems = [];
@@ -125,19 +140,22 @@ class PaymentInquiryService
      *
      * @param  string  $paymentConversationId
      * @param  string|null  $conversationId
+     * @param  string  $connection  'default' or 'quick_pwi'
      * @return array|null
      */
     public function retrievePaymentWithConversationId(
         string $paymentConversationId,
-        ?string $conversationId = null
+        ?string $conversationId = null,
+        string $connection = 'default'
     ): ?array {
         try {
+            $options = $this->getOptions($connection);
             $request = new RetrievePaymentRequest();
             $request->setLocale(Locale::TR);
             $request->setConversationId($conversationId ?? uniqid('conv_', true));
             $request->setPaymentConversationId($paymentConversationId);
 
-            $payment = Payment::retrieve($request, $this->options);
+            $payment = Payment::retrieve($request, $options);
 
             if ($payment->getStatus() === 'success') {
                 $paymentItems = [];

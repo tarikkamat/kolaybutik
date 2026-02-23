@@ -41,8 +41,8 @@ export function CategorySidebar({
                             onClick={() => onCategoryChange(null)}
                             className={`relative w-full rounded-md px-3 py-2.5 text-left text-sm transition-all ${
                                 !selectedCategoryId
-                                    ? 'border-l-4 border-indigo-700 bg-indigo-600 font-semibold text-white shadow-sm dark:border-indigo-800 dark:bg-indigo-700'
-                                    : 'text-slate-600 hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-700'
+                                    ? 'border-l-4 border-[color:var(--button-border)] bg-[color:var(--button-bg)] font-semibold text-[color:var(--button-text)] shadow-sm'
+                                    : 'text-slate-600 hover:bg-[color:var(--button-bg-soft)] hover:text-[color:var(--button-bg)] dark:text-slate-400 dark:hover:bg-[color:var(--button-bg-soft)] dark:hover:text-[color:var(--button-bg)]'
                             }`}
                         >
                             {!selectedCategoryId && (
@@ -61,8 +61,8 @@ export function CategorySidebar({
                                 onClick={() => onCategoryChange(category.id)}
                                 className={`relative w-full rounded-md px-3 py-2.5 text-left text-sm transition-all ${
                                     selectedCategoryId === category.id
-                                        ? 'border-l-4 border-indigo-700 bg-indigo-600 font-semibold text-white shadow-sm dark:border-indigo-800 dark:bg-indigo-700'
-                                        : 'text-slate-600 hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-700'
+                                        ? 'border-l-4 border-[color:var(--button-border)] bg-[color:var(--button-bg)] font-semibold text-[color:var(--button-text)] shadow-sm'
+                                        : 'text-slate-600 hover:bg-[color:var(--button-bg-soft)] hover:text-[color:var(--button-bg)] dark:text-slate-400 dark:hover:bg-[color:var(--button-bg-soft)] dark:hover:text-[color:var(--button-bg)]'
                                 }`}
                             >
                                 {selectedCategoryId === category.id && (

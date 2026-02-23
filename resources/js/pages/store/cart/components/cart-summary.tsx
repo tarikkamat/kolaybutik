@@ -56,10 +56,7 @@ export function CartSummary({
             </div>
 
             <Link href="/store/checkout" className="mt-6 block">
-                <Button
-                    size="lg"
-                    className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
-                >
+                <Button size="lg" className="w-full">
                     Ödemeye Geç
                     <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>

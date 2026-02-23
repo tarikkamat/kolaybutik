@@ -20,7 +20,6 @@ export default function CtaSection() {
                     >
                         <Button
                             size="lg"
-                            className="bg-white text-indigo-600 hover:bg-slate-100"
                         >
                             Dokümantasyonu İncele
                             <ArrowRight className="ml-2 h-4 w-4" />

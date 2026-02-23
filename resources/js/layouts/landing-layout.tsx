@@ -7,6 +7,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+// import ChatbotSidebar from '@/components/chatbot/chatbot-sidebar';
 
 interface LegalPageLayoutProps {
     title: string;
@@ -75,7 +76,7 @@ export default function LandingLayout({
                                     Faydalı Servisler
                                 </Link>
                                 <DropdownMenu>
-                                    <DropdownMenuTrigger className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 flex items-center gap-1">
+                                    <DropdownMenuTrigger className="flex items-center gap-1 rounded-md bg-[color:var(--button-bg)] px-4 py-2 text-sm font-medium text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)]">
                                         Canlı Demo
                                         <ChevronDown className="h-4 w-4" />
                                     </DropdownMenuTrigger>
@@ -83,9 +84,10 @@ export default function LandingLayout({
                                         <DropdownMenuItem asChild>
                                             <Link href="/store">Test Mağaza</Link>
                                         </DropdownMenuItem>
+                                        {/** TODO:
                                         <DropdownMenuItem asChild>
                                             <Link href="/subscription">Test Abonelik</Link>
-                                        </DropdownMenuItem>
+                                        </DropdownMenuItem>*/}
                                         <DropdownMenuItem asChild>
                                             <Link href="/services/iyzico-link">Test iyziLink</Link>
                                         </DropdownMenuItem>
@@ -98,6 +100,9 @@ export default function LandingLayout({
 
                 {/* Main Content */}
                 <main className="flex-1">{children}</main>
+
+                {/* Chatbot Sidebar
+                <ChatbotSidebar /> */}
 
                 {/* Footer */}
                 <footer className="border-t border-slate-200 bg-white px-4 py-12 dark:border-slate-800 dark:bg-slate-900">
@@ -208,7 +213,7 @@ export default function LandingLayout({
                                             href="#products"
                                             className="hover:text-indigo-600"
                                         >
-                                            iyzico Çözümleri
+                                            Kullanabileceğiniz Ürünler
                                         </Link>
                                     </li>
                                     <li>
@@ -216,7 +221,7 @@ export default function LandingLayout({
                                             href="#services"
                                             className="hover:text-indigo-600"
                                         >
-                                            Faydalı Çözümler
+                                            İşinizi Kolaylaştıracak Çözümler
                                         </Link>
                                     </li>
                                 </ul>

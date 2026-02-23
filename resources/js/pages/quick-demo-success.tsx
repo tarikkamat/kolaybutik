@@ -58,7 +58,7 @@ export default function QuickDemoSuccess({
                                 </Button>
                             </Link>
                             <Link href="/">
-                                <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 sm:w-auto">
+                                <Button className="w-full sm:w-auto">
                                     <Home className="mr-2 h-4 w-4" />
                                     Ana Sayfaya Dön
                                 </Button>
@@ -70,4 +70,3 @@ export default function QuickDemoSuccess({
         </>
     );
 }
-

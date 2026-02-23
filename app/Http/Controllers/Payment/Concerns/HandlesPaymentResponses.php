@@ -63,8 +63,10 @@ trait HandlesPaymentResponses
 
     /**
      * Handle payment result with appropriate response
+     *
+     * @param  string|null  $paymentMethod  e.g. 'quick_pwi' so order success page can query payment with correct API keys
      */
-    protected function handlePaymentResult(Request $request, array $result, bool $requires3ds = false): JsonResponse|RedirectResponse
+    protected function handlePaymentResult(Request $request, array $result, bool $requires3ds = false, ?string $paymentMethod = null): JsonResponse|RedirectResponse
     {
         if ($result['status'] === 'success') {
             if ($requires3ds) {
@@ -81,10 +83,14 @@ trait HandlesPaymentResponses
 
             // Callback'lerden sonra success sayfasına yönlendir
             $orderId = $result['paymentId'] ?? 'ORD-'.time();
-            return redirect()->route('store.orders.success', [
+            $params = [
                 'orderId' => $orderId,
                 'paymentId' => $result['paymentId'] ?? null,
-            ]);
+            ];
+            if ($paymentMethod !== null) {
+                $params['paymentMethod'] = $paymentMethod;
+            }
+            return redirect()->route('store.orders.success', $params);
         }
 
         // Callback'lerden sonra error durumunda failed sayfasına yönlendir

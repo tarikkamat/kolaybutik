@@ -10,6 +10,7 @@ use App\Http\Controllers\Product\CategoryController as StoreCategoryController;
 use App\Http\Controllers\Product\ProductController as StoreProductController;
 use App\Http\Controllers\Report\ReportsController;
 use App\Http\Controllers\Service\CardStorageController;
+use App\Http\Controllers\Service\ChatbotController;
 use App\Http\Controllers\Service\InstallmentBinController;
 use App\Http\Controllers\Service\IyzicoLinkController;
 use App\Http\Controllers\Service\PaymentInquiryController;
@@ -48,6 +49,7 @@ Route::prefix('services')->group(function () {
     Route::get('/payment-inquiry', [PaymentInquiryController::class, 'index'])->name('payment-inquiry.index');
     Route::get('/card-storage', [CardStorageController::class, 'index'])->name('card-storage.index');
     Route::get('/iyzico-link', [IyzicoLinkController::class, 'index'])->name('iyzico-link.index');
+    Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
 
     // Card Storage API routes
     Route::post('/card-storage/create', [CardStorageController::class, 'createCard'])->name('card-storage.create');
@@ -98,6 +100,12 @@ Route::prefix('services')->group(function () {
     Route::post('/iyzico-link/update', [IyzicoLinkController::class, 'update'])->name('iyzico-link.update');
     Route::post('/iyzico-link/update-status', [IyzicoLinkController::class, 'updateStatus'])->name('iyzico-link.update-status');
     Route::post('/iyzico-link/delete', [IyzicoLinkController::class, 'delete'])->name('iyzico-link.delete');
+
+    // Chatbot API routes
+    Route::post('/chatbot/conversation/create', [ChatbotController::class, 'createConversation'])->name('chatbot.conversation.create');
+    Route::post('/chatbot/conversation/continue', [ChatbotController::class, 'continueConversation'])->name('chatbot.conversation.continue');
+    Route::post('/chatbot/answer', [ChatbotController::class, 'getAnswer'])->name('chatbot.answer');
+    Route::post('/chatbot/history', [ChatbotController::class, 'getHistory'])->name('chatbot.history');
 });
 
 // Subscription Routes

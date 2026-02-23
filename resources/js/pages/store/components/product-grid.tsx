@@ -54,18 +54,18 @@ export function ProductGrid({
             {products.links && products.links.length > 3 && (
                 <div className="mt-8 flex justify-center gap-2">
                     {products.links.map((link, index) => (
-                        <Link
-                            key={index}
-                            href={link.url || '#'}
-                            className={`rounded-md px-4 py-2 ${
-                                link.active
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-white text-slate-700 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300'
-                            }`}
-                            dangerouslySetInnerHTML={{
-                                __html: link.label,
-                            }}
-                        />
+                            <Link
+                                key={index}
+                                href={link.url || '#'}
+                                className={`rounded-md px-4 py-2 ${
+                                    link.active
+                                        ? 'bg-[color:var(--button-bg)] text-[color:var(--button-text)]'
+                                        : 'bg-white text-slate-700 hover:bg-[color:var(--button-bg-soft)] hover:text-[color:var(--button-bg)] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-[color:var(--button-bg-soft)] dark:hover:text-[color:var(--button-bg)]'
+                                }`}
+                                dangerouslySetInnerHTML={{
+                                    __html: link.label,
+                                }}
+                            />
                     ))}
                 </div>
             )}
