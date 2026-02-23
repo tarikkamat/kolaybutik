@@ -79,9 +79,9 @@ class CheckoutFormService
             $nameParts = explode(' ', $data['full_name'], 2);
             $buyer->setName($nameParts[0] ?? 'Ad');
             $buyer->setSurname($nameParts[1] ?? 'Soyad');
-            $buyer->setGsmNumber("+905546041451"); // TODO:
+            $buyer->setGsmNumber("+905424372809"); // TODO:
             $buyer->setEmail($data['email'] ?? 'customer@example.com');
-            $buyer->setIdentityNumber('11111111111');
+            $buyer->setIdentityNumber('71350015990');
             $buyer->setLastLoginDate(date('Y-m-d H:i:s'));
             $buyer->setRegistrationDate(date('Y-m-d H:i:s'));
             $buyer->setRegistrationAddress($data['address'] ?? 'Adres');

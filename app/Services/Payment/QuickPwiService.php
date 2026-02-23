@@ -78,7 +78,7 @@ class QuickPwiService
             $buyer->setSurname($nameParts[1] ?? 'Soyad');
             $buyer->setGsmNumber('+905309720000');
             $buyer->setEmail($data['email'] ?? 'customer@example.com');
-            $buyer->setIdentityNumber('11111111111');
+            $buyer->setIdentityNumber('71350015990');
             $buyer->setLastLoginDate(date('Y-m-d H:i:s'));
             $buyer->setRegistrationDate(date('Y-m-d H:i:s'));
             $buyer->setRegistrationAddress($data['address'] ?? 'Adres');
