@@ -38,7 +38,7 @@ class SubscriptionSubscriberActionService
             $request->setName($data['name'] ?? null);
             $request->setSurname($data['surname'] ?? null);
             $request->setEmail($data['email'] ?? null);
-            $request->setGsmNumber($data['gsmNumber'] ?? null);
+            $request->setGsmNumber("+905546041451"); // TODO:
             $request->setIdentityNumber($data['identityNumber'] ?? null);
             $request->setCity($data['city'] ?? null);
             $request->setCountry($data['country'] ?? null);

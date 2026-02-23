@@ -93,7 +93,7 @@ class ApiService
             $buyer->setSurname(explode(' ', $data['full_name'], 2)[1] ?? '');
             $buyer->setGsmNumber("+905546041451"); // TODO:
             $buyer->setEmail($data['email']);
-            $buyer->setIdentityNumber('11111111111'); // Test için
+            $buyer->setIdentityNumber('71350015990'); // Test için
             $buyer->setLastLoginDate(date('Y-m-d H:i:s'));
             $buyer->setRegistrationDate(date('Y-m-d H:i:s'));
             $buyer->setRegistrationAddress($data['address']);
@@ -223,7 +223,7 @@ class ApiService
             $buyer->setSurname(explode(' ', $data['full_name'], 2)[1] ?? '');
             $buyer->setGsmNumber("+905546041451"); // TODO:
             $buyer->setEmail($data['email']);
-            $buyer->setIdentityNumber('11111111111'); // Test için
+            $buyer->setIdentityNumber('71350015990'); // Test için
             $buyer->setLastLoginDate(date('Y-m-d H:i:s'));
             $buyer->setRegistrationDate(date('Y-m-d H:i:s'));
             $buyer->setRegistrationAddress($data['address']);
