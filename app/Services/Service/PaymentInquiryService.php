@@ -13,13 +13,18 @@ class PaymentInquiryService
      * Build iyzipay Options for the given connection.
      * Use 'quick_pwi' for Quick Pay with iyzico payments (checkout).
      *
-     * @param  string  $connection  'default' or 'quick_pwi'
+     * @param  string  $connection  'default', 'quick_pwi' or 'card_storage'
      */
     private function getOptions(string $connection = 'default'): Options
     {
         $options = new Options();
         if ($connection === 'quick_pwi') {
             $config = config('iyzipay.quick_pwi');
+            $options->setApiKey($config['api_key']);
+            $options->setSecretKey($config['secret_key']);
+            $options->setBaseUrl($config['base_url']);
+        } elseif ($connection === 'card_storage') {
+            $config = config('iyzipay.card_storage');
             $options->setApiKey($config['api_key']);
             $options->setSecretKey($config['secret_key']);
             $options->setBaseUrl($config['base_url']);
@@ -37,7 +42,7 @@ class PaymentInquiryService
      *
      * @param  string  $paymentId
      * @param  string|null  $conversationId
-     * @param  string  $connection  'default' or 'quick_pwi' (use quick_pwi for Quick Pay with iyzico checkout payments)
+     * @param  string  $connection  'default', 'quick_pwi' or 'card_storage'
      * @return array|null
      */
     public function retrievePayment(string $paymentId, ?string $conversationId = null, string $connection = 'default'): ?array
@@ -140,7 +145,7 @@ class PaymentInquiryService
      *
      * @param  string  $paymentConversationId
      * @param  string|null  $conversationId
-     * @param  string  $connection  'default' or 'quick_pwi'
+     * @param  string  $connection  'default', 'quick_pwi' or 'card_storage'
      * @return array|null
      */
     public function retrievePaymentWithConversationId(
@@ -241,4 +246,3 @@ class PaymentInquiryService
         }
     }
 }
-

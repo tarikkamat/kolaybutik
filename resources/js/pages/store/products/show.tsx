@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useAddToCart } from '@/hooks/use-add-to-cart';
+import { useI18n } from '@/i18n';
 import StoreLayout from '@/layouts/store-layout';
 import { Product } from '@/types/models';
 import { Head, Link } from '@inertiajs/react';
@@ -19,6 +20,7 @@ export default function ProductShow({
     latestProducts,
 }: ProductShowProps) {
     const { addingToCart, handleAddToCart } = useAddToCart();
+    const { text, language } = useI18n();
 
     const discountPercentage =
         product.sale_price && product.sale_price < product.price
@@ -39,7 +41,7 @@ export default function ProductShow({
                                 href="/store"
                                 className="text-slate-600 hover:text-indigo-600 dark:text-slate-400"
                             >
-                                Mağaza
+                                {text('Mağaza', 'Store')}
                             </Link>
                         </li>
                         <li className="text-slate-400">/</li>
@@ -74,7 +76,7 @@ export default function ProductShow({
                         ) : (
                             <div className="flex h-96 w-full items-center justify-center rounded-lg border border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-800">
                                 <span className="text-slate-400">
-                                    Resim Yok
+                                    {text('Resim Yok', 'No Image')}
                                 </span>
                             </div>
                         )}
@@ -106,8 +108,10 @@ export default function ProductShow({
                                         ₺{product.price.toFixed(2)}
                                     </span>
                                     {discountPercentage > 0 && (
-                                        <span className="rounded-md px-2 py-1 text-sm font-semibold chip-success">
-                                            %{discountPercentage} İndirim
+                                        <span className="chip-success rounded-md px-2 py-1 text-sm font-semibold">
+                                            {language === 'tr'
+                                                ? `%${discountPercentage} İndirim`
+                                                : `${discountPercentage}% Discount`}
                                         </span>
                                     )}
                                 </div>
@@ -120,12 +124,12 @@ export default function ProductShow({
 
                         <div className="mb-8 rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-800">
                             <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
-                                Ürün Bilgileri
+                                {text('Ürün Bilgileri', 'Product Details')}
                             </h3>
                             <dl className="space-y-2">
                                 <div className="flex justify-between">
                                     <dt className="text-slate-600 dark:text-slate-400">
-                                        Fiyat:
+                                        {text('Fiyat:', 'Price:')}
                                     </dt>
                                     <dd className="font-semibold text-slate-900 dark:text-white">
                                         {product.sale_price &&
@@ -137,7 +141,7 @@ export default function ProductShow({
                                 {product.category && (
                                     <div className="flex justify-between">
                                         <dt className="text-slate-600 dark:text-slate-400">
-                                            Kategori:
+                                            {text('Kategori:', 'Category:')}
                                         </dt>
                                         <dd className="font-semibold text-slate-900 dark:text-white">
                                             {product.category.name}
@@ -158,13 +162,16 @@ export default function ProductShow({
                                 <>
                                     <Spinner />
                                     <span className="ml-2">
-                                        Sepete Ekleniyor
+                                        {text(
+                                            'Sepete Ekleniyor',
+                                            'Adding to Cart',
+                                        )}
                                     </span>
                                 </>
                             ) : (
                                 <>
                                     <ShoppingCart className="mr-2 h-5 w-5" />
-                                    Sepete Ekle
+                                    {text('Sepete Ekle', 'Add to Cart')}
                                 </>
                             )}
                         </Button>
@@ -175,7 +182,7 @@ export default function ProductShow({
                 {relatedProducts.length > 0 && (
                     <div className="mt-12">
                         <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
-                            Benzer Ürünler
+                            {text('Benzer Ürünler', 'Related Products')}
                         </h2>
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                             {relatedProducts.map((relatedProduct) => (

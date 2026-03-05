@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/i18n';
 import { OrderShowProps } from '@/types/order';
 import { Link } from '@inertiajs/react';
 import {
@@ -14,6 +15,9 @@ export function OrderDetailsContent({
     paymentId,
     paymentData,
 }: OrderShowProps) {
+    const { text, language } = useI18n();
+    const locale = language === 'tr' ? 'tr-TR' : 'en-US';
+
     const getStatusIcon = (status?: string) => {
         if (status === 'SUCCESS') {
             return <CheckCircle2 className="h-5 w-5 text-green-600" />;
@@ -25,11 +29,11 @@ export function OrderDetailsContent({
 
     const getStatusText = (status?: string) => {
         if (status === 'SUCCESS') {
-            return 'Başarılı';
+            return text('Başarılı', 'Successful');
         } else if (status === 'FAILURE') {
-            return 'Başarısız';
+            return text('Başarısız', 'Failed');
         }
-        return 'Beklemede';
+        return text('Beklemede', 'Pending');
     };
 
     const getStatusColor = (status?: string) => {
@@ -48,17 +52,17 @@ export function OrderDetailsContent({
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                            Sipariş Detayları
+                            {text('Sipariş Detayları', 'Order Details')}
                         </h1>
                         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                            Sipariş No:{' '}
+                            {text('Sipariş No:', 'Order No:')}{' '}
                             <span className="font-semibold">{orderId}</span>
                         </p>
                     </div>
                     <Link href="/store">
                         <Button variant="outline" className="w-full sm:w-auto">
                             <Home className="mr-2 h-4 w-4" />
-                            Mağazaya Dön
+                            {text('Mağazaya Dön', 'Back to Store')}
                         </Button>
                     </Link>
                 </div>
@@ -70,7 +74,7 @@ export function OrderDetailsContent({
                     <div className="mb-4 flex items-center gap-2">
                         <CreditCard className="h-5 w-5 text-indigo-600" />
                         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                            Ödeme Bilgileri
+                            {text('Ödeme Bilgileri', 'Payment Information')}
                         </h2>
                     </div>
 
@@ -78,7 +82,7 @@ export function OrderDetailsContent({
                         {/* Payment Status */}
                         <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-700">
                             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                Ödeme Durumu:
+                                {text('Ödeme Durumu:', 'Payment Status:')}
                             </span>
                             <div
                                 className={`flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${getStatusColor(
@@ -94,7 +98,7 @@ export function OrderDetailsContent({
                         {paymentId && (
                             <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-700">
                                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                    Ödeme ID:
+                                    {text('Ödeme ID:', 'Payment ID:')}
                                 </span>
                                 <span className="font-mono text-sm text-slate-600 dark:text-slate-400">
                                     {paymentId}
@@ -105,7 +109,7 @@ export function OrderDetailsContent({
                         {/* Amount */}
                         <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-700">
                             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                Tutar:
+                                {text('Tutar:', 'Amount:')}
                             </span>
                             <span className="text-lg font-bold text-slate-900 dark:text-white">
                                 {paymentData.paidPrice} {paymentData.currency}
@@ -116,7 +120,7 @@ export function OrderDetailsContent({
                         {paymentData.cardAssociation && (
                             <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-700">
                                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                    Kart:
+                                    {text('Kart:', 'Card:')}
                                 </span>
                                 <span className="text-sm text-slate-600 dark:text-slate-400">
                                     {paymentData.cardAssociation}{' '}
@@ -132,10 +136,11 @@ export function OrderDetailsContent({
                             paymentData.installment > 1 && (
                                 <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-700">
                                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                        Taksit:
+                                        {text('Taksit:', 'Installment:')}
                                     </span>
                                     <span className="text-sm text-slate-600 dark:text-slate-400">
-                                        {paymentData.installment} Taksit
+                                        {paymentData.installment}{' '}
+                                        {text('Taksit', 'Installments')}
                                     </span>
                                 </div>
                             )}
@@ -144,7 +149,7 @@ export function OrderDetailsContent({
                         {paymentData.authCode && (
                             <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-700">
                                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                    Onay Kodu:
+                                    {text('Onay Kodu:', 'Auth Code:')}
                                 </span>
                                 <span className="font-mono text-sm text-slate-600 dark:text-slate-400">
                                     {paymentData.authCode}
@@ -156,12 +161,12 @@ export function OrderDetailsContent({
                         {paymentData.systemTime && (
                             <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-700">
                                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                    İşlem Tarihi:
+                                    {text('İşlem Tarihi:', 'Transaction Date:')}
                                 </span>
                                 <span className="text-sm text-slate-600 dark:text-slate-400">
                                     {new Date(
                                         paymentData.systemTime,
-                                    ).toLocaleString('tr-TR')}
+                                    ).toLocaleString(locale)}
                                 </span>
                             </div>
                         )}
@@ -175,12 +180,18 @@ export function OrderDetailsContent({
                     <div className="flex items-center gap-2">
                         <XCircle className="h-5 w-5 text-red-600" />
                         <h2 className="text-lg font-semibold text-red-900 dark:text-red-100">
-                            Ödeme Bilgileri Alınamadı
+                            {text(
+                                'Ödeme Bilgileri Alınamadı',
+                                'Payment Information Unavailable',
+                            )}
                         </h2>
                     </div>
                     <p className="mt-2 text-sm text-red-700 dark:text-red-300">
                         {paymentData.errorMessage ||
-                            'Ödeme bilgileri alınırken bir hata oluştu.'}
+                            text(
+                                'Ödeme bilgileri alınırken bir hata oluştu.',
+                                'An error occurred while retrieving payment information.',
+                            )}
                     </p>
                 </div>
             )}
@@ -189,7 +200,10 @@ export function OrderDetailsContent({
             {!paymentData && (
                 <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-800">
                     <p className="text-center text-slate-600 dark:text-slate-400">
-                        Ödeme bilgisi bulunamadı.
+                        {text(
+                            'Ödeme bilgisi bulunamadı.',
+                            'No payment information found.',
+                        )}
                     </p>
                 </div>
             )}

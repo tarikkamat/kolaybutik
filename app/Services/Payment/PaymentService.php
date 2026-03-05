@@ -2,6 +2,8 @@
 
 namespace App\Services\Payment;
 
+use App\Services\Service\CardStorageService;
+
 class PaymentService
 {
     private ApiService $apiService;
@@ -9,6 +11,7 @@ class PaymentService
     private QuickPwiService $quickPwiService;
     private WalletService $walletService;
     private IyzicoLinkService $iyzicoLinkService;
+    private CardStorageService $cardStorageService;
 
     public function __construct(
         ApiService $apiService,
@@ -16,12 +19,14 @@ class PaymentService
         QuickPwiService $quickPwiService,
         WalletService $walletService,
         IyzicoLinkService $iyzicoLinkService,
+        CardStorageService $cardStorageService,
     ) {
         $this->apiService = $apiService;
         $this->checkoutFormService = $checkoutFormService;
         $this->quickPwiService = $quickPwiService;
         $this->walletService = $walletService;
         $this->iyzicoLinkService = $iyzicoLinkService;
+        $this->cardStorageService = $cardStorageService;
     }
 
     /**
@@ -70,6 +75,7 @@ class PaymentService
             'api_credit_card' => $this->apiService->processCreditCardPayment($data),
             'api_threeds' => $this->apiService->initializeThreedsPayment($data),
             'api_threeds_post_auth' => $this->apiService->processThreedsPostAuth($data),
+            'saved_card' => $this->apiService->processSavedCardPayment($data),
             'checkout_form' => $this->checkoutFormService->processCheckoutFormPayment($data),
             'quick_pwi' => $this->quickPwiService->processQuickPayment($data),
             'wallet' => $this->walletService->processWalletPayment($data),
@@ -144,8 +150,7 @@ class PaymentService
      */
     public function processSavedCardPayment(array $data): ?array
     {
-        // Saved card payments typically use API service
-        return $this->apiService->processCreditCardPayment($data);
+        return $this->apiService->processSavedCardPayment($data);
     }
 
     /**
@@ -160,15 +165,42 @@ class PaymentService
     }
 
     /**
-     * Get saved cards for user
+     * Get saved cards for cardUserKey
      *
-     * @param  int  $userId
+     * @param  string|null  $cardUserKey
      * @return array|null
      */
-    public function getSavedCards(int $userId): ?array
+    public function getSavedCards(?string $cardUserKey = null): ?array
     {
-        // TODO: Get saved cards from iyzico
-        return null;
+        $resolvedCardUserKey = $cardUserKey ?: config('iyzipay.card_storage.default_card_user_key');
+
+        if (!$resolvedCardUserKey) {
+            return [
+                'status' => 'error',
+                'cards' => [],
+                'cardUserKey' => null,
+                'errorMessage' => 'cardUserKey gerekli',
+                'errorCode' => 'MISSING_CARD_USER_KEY',
+            ];
+        }
+
+        $result = $this->cardStorageService->retrieveCards($resolvedCardUserKey);
+
+        if (!$result || ($result['status'] ?? '') !== 'success') {
+            return [
+                'status' => 'error',
+                'cards' => [],
+                'cardUserKey' => $resolvedCardUserKey,
+                'errorMessage' => $result['errorMessage'] ?? 'Kartlar getirilemedi',
+                'errorCode' => $result['errorCode'] ?? 'CARD_RETRIEVE_FAILED',
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'cards' => $result['cards'] ?? [],
+            'cardUserKey' => $result['cardUserKey'] ?? $resolvedCardUserKey,
+        ];
     }
 
     /**
@@ -250,4 +282,3 @@ class PaymentService
         return $this->iyzicoLinkService->deleteIyziLink($token);
     }
 }
-

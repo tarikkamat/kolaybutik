@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/i18n';
 import StoreLayout from '@/layouts/store-layout';
-import { CheckoutIndexProps } from '@/types/cart';
+import { CheckoutIndexProps, SavedCard } from '@/types/cart';
 import { fakerTR as faker } from '@faker-js/faker';
 import { Head, Link, router } from '@inertiajs/react';
 import {
@@ -16,10 +17,16 @@ import { PaymentOptions } from './components/payment-options';
 import { ShippingAddressForm } from './components/shipping-address-form';
 
 const STEPS = [
-    { id: 1, name: 'Adres Bilgileri', icon: MapPin },
-    { id: 2, name: 'Ödeme Seçenekleri', icon: CreditCard },
-    { id: 3, name: 'Ödeme Sonucu', icon: CheckCircle2 },
+    { id: 1, icon: MapPin },
+    { id: 2, icon: CreditCard },
+    { id: 3, icon: CheckCircle2 },
 ] as const;
+
+interface InstallmentOption {
+    installmentNumber: number;
+    installmentPrice: number;
+    totalPrice: number;
+}
 
 export default function CheckoutIndex({
     items,
@@ -28,11 +35,17 @@ export default function CheckoutIndex({
     shipping = 0,
     total,
 }: CheckoutIndexProps) {
+    const { text } = useI18n();
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [installmentOptions, setInstallmentOptions] = useState<any[]>([]);
+    const [installmentOptions, setInstallmentOptions] = useState<
+        InstallmentOption[]
+    >([]);
     const [selectedInstallment, setSelectedInstallment] = useState<number>(1);
     const [isLoadingInstallments, setIsLoadingInstallments] = useState(false);
+    const [savedCards, setSavedCards] = useState<SavedCard[]>([]);
+    const [isLoadingSavedCards, setIsLoadingSavedCards] = useState(false);
+    const [savedCardsError, setSavedCardsError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         // Shipping Address
         full_name: '',
@@ -51,6 +64,8 @@ export default function CheckoutIndex({
         payment_method: '',
         use_3d: false,
         installment: 1,
+        card_user_key: '',
+        card_token: '',
     });
 
     const validateStep = (step: number): boolean => {
@@ -80,6 +95,9 @@ export default function CheckoutIndex({
                     formData.card_cvv
                 );
             }
+            if (formData.payment_method === 'saved_card') {
+                return !!(formData.card_user_key && formData.card_token);
+            }
             // For other payment methods, just having a method selected is enough
             return true;
         }
@@ -107,56 +125,74 @@ export default function CheckoutIndex({
             return;
         }
 
-        // Kredi kartı ödemesi için payment endpoint'ine istek at
         if (formData.payment_method === 'credit_card') {
-            setIsSubmitting(true);
+            await submitApiPayment('/store/payment/credit-card', 'credit_card');
+            return;
+        }
 
-            try {
-                const response = await fetch('/store/payment/credit-card', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN':
-                            document
-                                .querySelector('meta[name="csrf-token"]')
-                                ?.getAttribute('content') || '',
-                        Accept: 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
+        if (formData.payment_method === 'saved_card') {
+            await submitApiPayment('/store/payment/saved-card', 'saved_card');
+            return;
+        }
 
-                // Response JSON olmalı (Accept: application/json header'ı gönderdik)
-                const result = await response.json();
+        // Diğer ödeme yöntemleri için eski akış
+        setIsSubmitting(true);
+        try {
+            await router.post('/store/checkout', formData);
+        } catch {
+            // Sipariş hatası
+            setIsSubmitting(false);
+        }
+    };
 
-                if (result.status === 'success') {
-                    if (result.requires3ds && result.redirectUrl) {
-                        // 3DS sayfasına yönlendir
-                        window.location.href = result.redirectUrl;
-                    } else {
-                        // Non-3DS ödeme başarılı, success sayfasına yönlendir
-                        const orderId = result.paymentId || 'ORD-' + Date.now();
-                        router.visit(
-                            `/store/orders/success?orderId=${orderId}&paymentId=${result.paymentId}`,
-                        );
-                    }
-                } else {
-                    alert(result.message || 'Ödeme işlemi başarısız');
-                    setIsSubmitting(false);
+    const submitApiPayment = async (
+        endpoint: string,
+        paymentMethod: 'credit_card' | 'saved_card',
+    ) => {
+        setIsSubmitting(true);
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN':
+                        document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute('content') || '',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                if (result.requires3ds && result.redirectUrl) {
+                    window.location.href = result.redirectUrl;
+                    return;
                 }
-            } catch (error) {
-                // Ödeme hatası
-                alert('Ödeme işlemi sırasında bir hata oluştu');
-                setIsSubmitting(false);
+
+                const orderId = result.paymentId || 'ORD-' + Date.now();
+                router.visit(
+                    `/store/orders/success?orderId=${orderId}&paymentId=${result.paymentId}&paymentMethod=${paymentMethod}`,
+                );
+                return;
             }
-        } else {
-            // Diğer ödeme yöntemleri için eski akış
-            setIsSubmitting(true);
-            try {
-                await router.post('/store/checkout', formData);
-            } catch (error) {
-                // Sipariş hatası
-                setIsSubmitting(false);
-            }
+
+            alert(
+                result.message ||
+                    text('Ödeme işlemi başarısız', 'Payment transaction failed'),
+            );
+            setIsSubmitting(false);
+        } catch {
+            alert(
+                text(
+                    'Ödeme işlemi sırasında bir hata oluştu',
+                    'An error occurred during payment processing',
+                ),
+            );
+            setIsSubmitting(false);
         }
     };
 
@@ -212,7 +248,7 @@ export default function CheckoutIndex({
                     setSelectedInstallment(1);
                     setFormData((prev) => ({ ...prev, installment: 1 }));
                 }
-            } catch (error) {
+            } catch {
                 // Taksit bilgileri alınamadı
                 setInstallmentOptions([]);
                 setSelectedInstallment(1);
@@ -233,6 +269,8 @@ export default function CheckoutIndex({
         installmentPrice: number,
         totalPrice: number,
     ) => {
+        void installmentPrice;
+        void totalPrice;
         setSelectedInstallment(installmentNumber);
         setFormData((prev) => ({ ...prev, installment: installmentNumber }));
     };
@@ -246,8 +284,87 @@ export default function CheckoutIndex({
     };
 
     const handleCardCvvChange = (value: string) => {
-        const cleaned = value.replace(/\D/g, '').slice(0, 3);
+        const cleaned = value.replace(/\D/g, '').slice(0, 4);
         setFormData((prev) => ({ ...prev, card_cvv: cleaned }));
+    };
+
+    const fetchSavedCards = async (cardUserKey?: string) => {
+        setIsLoadingSavedCards(true);
+        setSavedCardsError(null);
+
+        try {
+            const resolvedCardUserKey =
+                cardUserKey ?? formData.card_user_key ?? '';
+            const query = resolvedCardUserKey
+                ? `?cardUserKey=${encodeURIComponent(resolvedCardUserKey)}`
+                : '';
+
+            const response = await fetch(`/store/payment/saved-cards${query}`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                },
+            });
+
+            const result = await response.json();
+            const cards = Array.isArray(result.cards) ? result.cards : [];
+            const fetchedCardUserKey =
+                result.cardUserKey || resolvedCardUserKey || '';
+
+            setSavedCards(cards);
+            setFormData((prev) => ({
+                ...prev,
+                card_user_key: fetchedCardUserKey,
+                card_token: cards.some(
+                    (card: SavedCard) => card.cardToken === prev.card_token,
+                )
+                    ? prev.card_token
+                    : '',
+            }));
+
+            if (result.status !== 'success') {
+                setSavedCardsError(
+                    result.message ||
+                        text(
+                            'Saklı kartlar getirilemedi',
+                            'Saved cards could not be retrieved',
+                        ),
+                );
+            }
+        } catch {
+            setSavedCards([]);
+            setSavedCardsError(
+                text(
+                    'Saklı kartlar alınırken hata oluştu',
+                    'An error occurred while loading saved cards',
+                ),
+            );
+        } finally {
+            setIsLoadingSavedCards(false);
+        }
+    };
+
+    const handlePaymentMethodChange = (method: string) => {
+        if (method === 'saved_card') {
+            void fetchSavedCards();
+        }
+    };
+
+    const handleCardUserKeyChange = (value: string) => {
+        setSavedCardsError(null);
+        setSavedCards([]);
+        setFormData((prev) => ({
+            ...prev,
+            card_user_key: value,
+            card_token: '',
+        }));
+    };
+
+    const handleSavedCardSelect = (cardToken: string) => {
+        setFormData((prev) => ({
+            ...prev,
+            card_token: cardToken,
+        }));
     };
 
     const handleAutoFillAddress = () => {
@@ -263,24 +380,33 @@ export default function CheckoutIndex({
         }));
     };
 
+    const localizedSteps = [
+        { id: 1, name: text('Adres Bilgileri', 'Address Information') },
+        { id: 2, name: text('Ödeme Seçenekleri', 'Payment Options') },
+        { id: 3, name: text('Ödeme Sonucu', 'Payment Result') },
+    ];
+
     return (
-        <StoreLayout title="Ödeme">
-            <Head title="Ödeme" />
+        <StoreLayout title={text('Ödeme', 'Checkout')}>
+            <Head title={text('Ödeme', 'Checkout')} />
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 <Link
                     href="/store/cart"
                     className="mb-6 inline-flex items-center text-sm text-indigo-600 hover:text-indigo-700"
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Sepete Dön
+                    {text('Sepete Dön', 'Back to Cart')}
                 </Link>
 
                 <div className="mb-12">
                     <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
-                        Ödeme
+                        {text('Ödeme', 'Checkout')}
                     </h1>
                     <p className="mt-2 text-slate-600 dark:text-slate-400">
-                        Siparişinizi tamamlamak için bilgilerinizi girin
+                        {text(
+                            'Siparişinizi tamamlamak için bilgilerinizi girin',
+                            'Enter your details to complete your order',
+                        )}
                     </p>
                 </div>
 
@@ -346,7 +472,13 @@ export default function CheckoutIndex({
                                                               : 'text-slate-500'
                                                     }`}
                                                 >
-                                                    {step.name}
+                                                    {
+                                                        localizedSteps.find(
+                                                            (s) =>
+                                                                s.id ===
+                                                                step.id,
+                                                        )?.name
+                                                    }
                                                 </p>
                                             </div>
                                         </div>
@@ -375,6 +507,9 @@ export default function CheckoutIndex({
                                     <PaymentOptions
                                         formData={formData}
                                         onInputChange={handleInputChange}
+                                        onPaymentMethodChange={
+                                            handlePaymentMethodChange
+                                        }
                                         onCardNumberChange={
                                             handleCardNumberChange
                                         }
@@ -395,6 +530,20 @@ export default function CheckoutIndex({
                                         isLoadingInstallments={
                                             isLoadingInstallments
                                         }
+                                        savedCards={savedCards}
+                                        isLoadingSavedCards={
+                                            isLoadingSavedCards
+                                        }
+                                        savedCardsError={savedCardsError}
+                                        onFetchSavedCards={() =>
+                                            void fetchSavedCards()
+                                        }
+                                        onSavedCardSelect={
+                                            handleSavedCardSelect
+                                        }
+                                        onCardUserKeyChange={
+                                            handleCardUserKeyChange
+                                        }
                                     />
                                 )}
 
@@ -408,7 +557,7 @@ export default function CheckoutIndex({
                                                 onClick={handlePrevious}
                                             >
                                                 <ArrowLeft className="mr-2 h-4 w-4" />
-                                                Geri
+                                                {text('Geri', 'Back')}
                                             </Button>
                                         )}
                                     </div>
@@ -421,7 +570,7 @@ export default function CheckoutIndex({
                                                     !validateStep(currentStep)
                                                 }
                                             >
-                                                İleri
+                                                {text('İleri', 'Next')}
                                             </Button>
                                         )}
                                         {currentStep === 3 && (
@@ -433,8 +582,14 @@ export default function CheckoutIndex({
                                                 }
                                             >
                                                 {isSubmitting
-                                                    ? 'İşleniyor...'
-                                                    : 'Siparişi Tamamla'}
+                                                    ? text(
+                                                          'İşleniyor...',
+                                                          'Processing...',
+                                                      )
+                                                    : text(
+                                                          'Siparişi Tamamla',
+                                                          'Complete Order',
+                                                      )}
                                             </Button>
                                         )}
                                     </div>

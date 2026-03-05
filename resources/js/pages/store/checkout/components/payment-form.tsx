@@ -3,6 +3,7 @@ import {
     InputGroupAddon,
     InputGroupInput,
 } from '@/components/ui/input-group';
+import { useI18n } from '@/i18n';
 import { PaymentFormProps } from '@/types/cart';
 import { Calendar, CreditCard, Lock, User } from 'lucide-react';
 
@@ -13,12 +14,14 @@ export function PaymentForm({
     onCardExpiryChange,
     onCardCvvChange,
 }: PaymentFormProps) {
+    const { text } = useI18n();
+
     return (
         <div>
             <div className="grid grid-cols-1 gap-4">
                 <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Kart Numarası *
+                        {text('Kart Numarası *', 'Card Number *')}
                     </label>
                     <InputGroup>
                         <InputGroupAddon>
@@ -38,7 +41,7 @@ export function PaymentForm({
                 </div>
                 <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Kart Üzerindeki İsim *
+                        {text('Kart Üzerindeki İsim *', 'Name on Card *')}
                     </label>
                     <InputGroup>
                         <InputGroupAddon>
@@ -50,7 +53,10 @@ export function PaymentForm({
                             required
                             value={formData.card_name}
                             onChange={onInputChange}
-                            placeholder="Kart Üzerindeki İsim"
+                            placeholder={text(
+                                'Kart Üzerindeki İsim',
+                                'Name on Card',
+                            )}
                             hasAddon
                         />
                     </InputGroup>
@@ -58,7 +64,7 @@ export function PaymentForm({
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                            Son Kullanma *
+                            {text('Son Kullanma *', 'Expiry Date *')}
                         </label>
                         <InputGroup>
                             <InputGroupAddon>

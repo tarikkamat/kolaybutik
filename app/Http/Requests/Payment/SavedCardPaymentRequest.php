@@ -12,8 +12,11 @@ class SavedCardPaymentRequest extends BasePaymentRequest
     public function rules(): array
     {
         return array_merge($this->commonRules(), [
-            'saved_card_id' => 'required|string',
+            'card_token' => 'required|string',
+            'card_user_key' => 'required|string',
+            'card_cvv' => 'nullable|string|max:4',
+            'card_name' => 'nullable|string|max:255',
+            'installment' => 'nullable|integer|min:1',
         ]);
     }
 }
-

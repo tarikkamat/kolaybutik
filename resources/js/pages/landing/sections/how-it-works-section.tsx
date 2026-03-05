@@ -1,13 +1,15 @@
+import { useI18n } from '@/i18n';
 import { CheckCircle2, Code, CreditCard, Settings, Shield } from 'lucide-react';
 
 export default function HowItWorksSection() {
+    const { t } = useI18n();
+
     const steps = [
         {
             number: 1,
             icon: Settings,
-            title: 'iyzico Hesabı Oluştur',
-            description:
-                'iyzico panelinden hesabınızı oluşturun ve API anahtarlarınızı alın.',
+            title: t('landing.howItWorks.step1.title'),
+            description: t('landing.howItWorks.step1.description'),
             numberBg: 'bg-indigo-600',
             iconBg: 'bg-indigo-100 dark:bg-indigo-950',
             iconColor: 'text-indigo-600 dark:text-indigo-400',
@@ -15,9 +17,8 @@ export default function HowItWorksSection() {
         {
             number: 2,
             icon: Code,
-            title: 'Entegrasyon Yöntemini Seç',
-            description:
-                'API to API, Checkout Form veya Pay with iyzico yöntemlerinden birini seçin.',
+            title: t('landing.howItWorks.step2.title'),
+            description: t('landing.howItWorks.step2.description'),
             numberBg: 'bg-emerald-600',
             iconBg: 'bg-emerald-100 dark:bg-emerald-950',
             iconColor: 'text-emerald-600 dark:text-emerald-400',
@@ -25,9 +26,8 @@ export default function HowItWorksSection() {
         {
             number: 3,
             icon: CreditCard,
-            title: 'Entegrasyonu Yap',
-            description:
-                'Dokümantasyonu takip ederek entegrasyonu tamamlayın. Test ortamında deneyin.',
+            title: t('landing.howItWorks.step3.title'),
+            description: t('landing.howItWorks.step3.description'),
             numberBg: 'bg-amber-600',
             iconBg: 'bg-amber-100 dark:bg-amber-950',
             iconColor: 'text-amber-600 dark:text-amber-400',
@@ -35,9 +35,8 @@ export default function HowItWorksSection() {
         {
             number: 4,
             icon: Shield,
-            title: 'Canlıya Al',
-            description:
-                'Testler başarılı olduktan sonra canlı ortama geçin ve ödeme almaya başlayın.',
+            title: t('landing.howItWorks.step4.title'),
+            description: t('landing.howItWorks.step4.description'),
             numberBg: 'bg-purple-600',
             iconBg: 'bg-purple-100 dark:bg-purple-950',
             iconColor: 'text-purple-600 dark:text-purple-400',
@@ -52,10 +51,10 @@ export default function HowItWorksSection() {
             <div className="mx-auto max-w-6xl">
                 <div className="mb-16 text-center">
                     <h2 className="mb-4 text-3xl font-bold text-slate-900 sm:text-4xl dark:text-white">
-                        Entegrasyon Adımları
+                        {t('landing.howItWorks.title')}
                     </h2>
                     <p className="text-lg text-slate-600 dark:text-slate-400">
-                        iyzico entegrasyonu sadece birkaç adımda tamamlanır
+                        {t('landing.howItWorks.subtitle')}
                     </p>
                 </div>
 

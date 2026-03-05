@@ -37,6 +37,35 @@ class ApiService
     }
 
     /**
+     * Build iyzipay Options for the given connection.
+     *
+     * @param  string  $connection  'default' or 'card_storage'
+     */
+    private function getOptions(string $connection = 'default'): Options
+    {
+        if ($connection === 'default') {
+            return $this->options;
+        }
+
+        $options = new Options();
+
+        if ($connection === 'card_storage') {
+            $config = config('iyzipay.card_storage');
+            $options->setApiKey($config['api_key']);
+            $options->setSecretKey($config['secret_key']);
+            $options->setBaseUrl($config['base_url']);
+
+            return $options;
+        }
+
+        $options->setApiKey(config('iyzipay.api_key'));
+        $options->setSecretKey(config('iyzipay.secret_key'));
+        $options->setBaseUrl(config('iyzipay.base_url'));
+
+        return $options;
+    }
+
+    /**
      * Process credit card payment with iyzico (Non-3DS)
      *
      * @param  array  $data
@@ -45,6 +74,9 @@ class ApiService
     public function processCreditCardPayment(array $data): ?array
     {
         try {
+            $isSavedCardPayment = !empty($data['card_token']) && !empty($data['card_user_key']);
+            $options = $this->getOptions($isSavedCardPayment ? 'card_storage' : 'default');
+
             // Demo mod için cart summary kontrolü
             $cartSummary = $data['demo_cart_summary'] ?? $this->cartService->getCartSummary();
 
@@ -65,60 +97,76 @@ class ApiService
             $request->setPrice(number_format($subtotal, 2, '.', ''));
             $request->setPaidPrice(number_format($total, 2, '.', ''));
             $request->setCurrency(Currency::TL);
-            $request->setInstallment(1);
+            $request->setInstallment((int) ($data['installment'] ?? 1));
             $request->setBasketId('BASKET_'.time());
             $request->setPaymentChannel(PaymentChannel::WEB);
             $request->setPaymentGroup(PaymentGroup::PRODUCT);
 
             // Payment Card
             $paymentCard = new PaymentCard();
-            $paymentCard->setCardHolderName($data['card_name']);
 
-            // Kart numarasından boşlukları temizle
-            $cardNumber = preg_replace('/\s+/', '', $data['card_number']);
-            $paymentCard->setCardNumber($cardNumber);
+            if ($isSavedCardPayment) {
+                $paymentCard->setCardToken($data['card_token']);
+                $paymentCard->setCardUserKey($data['card_user_key']);
 
-            // Expiry date'i ayır (MM/YY formatından)
-            $expiry = explode('/', $data['card_expiry']);
-            $paymentCard->setExpireMonth(trim($expiry[0]));
-            $paymentCard->setExpireYear('20'.trim($expiry[1]));
-            $paymentCard->setCvc($data['card_cvv']);
-            $paymentCard->setRegisterCard(0);
+                if (!empty($data['card_name'])) {
+                    $paymentCard->setCardHolderName($data['card_name']);
+                }
+
+                if (!empty($data['card_cvv'])) {
+                    $paymentCard->setCvc($data['card_cvv']);
+                }
+            } else {
+                $paymentCard->setCardHolderName($data['card_name']);
+
+                // Kart numarasından boşlukları temizle
+                $cardNumber = preg_replace('/\s+/', '', $data['card_number']);
+                $paymentCard->setCardNumber($cardNumber);
+
+                // Expiry date'i ayır (MM/YY formatından)
+                $expiry = explode('/', $data['card_expiry']);
+                $paymentCard->setExpireMonth(trim($expiry[0]));
+                $paymentCard->setExpireYear('20'.trim($expiry[1]));
+                $paymentCard->setCvc($data['card_cvv']);
+                $paymentCard->setRegisterCard(0);
+            }
             $request->setPaymentCard($paymentCard);
 
             // Buyer
             $buyer = new Buyer();
+            $fullName = trim($data['full_name'] ?? 'Misafir Kullanıcı');
+            $nameParts = preg_split('/\s+/', $fullName, 2);
             $buyer->setId(Auth::check() ? (string) Auth::id() : 'GUEST_'.session()->getId());
-            $buyer->setName(explode(' ', $data['full_name'])[0] ?? $data['full_name']);
-            $buyer->setSurname(explode(' ', $data['full_name'], 2)[1] ?? '');
+            $buyer->setName($nameParts[0] ?? 'Misafir');
+            $buyer->setSurname($nameParts[1] ?? 'Kullanıcı');
             $buyer->setGsmNumber("+905546041451"); // TODO:
             $buyer->setEmail($data['email']);
             $buyer->setIdentityNumber('71350015990'); // Test için
             $buyer->setLastLoginDate(date('Y-m-d H:i:s'));
             $buyer->setRegistrationDate(date('Y-m-d H:i:s'));
-            $buyer->setRegistrationAddress($data['address']);
+            $buyer->setRegistrationAddress($data['address'] ?? 'Adres');
             $buyer->setIp(request()->ip());
-            $buyer->setCity($data['city']);
-            $buyer->setCountry($data['country']);
-            $buyer->setZipCode($data['postal_code']);
+            $buyer->setCity($data['city'] ?? 'Istanbul');
+            $buyer->setCountry($data['country'] ?? 'Turkey');
+            $buyer->setZipCode($data['postal_code'] ?? '34000');
             $request->setBuyer($buyer);
 
             // Shipping Address
             $shippingAddress = new Address();
-            $shippingAddress->setContactName($data['full_name']);
-            $shippingAddress->setCity($data['city']);
-            $shippingAddress->setCountry($data['country']);
-            $shippingAddress->setAddress($data['address']);
-            $shippingAddress->setZipCode($data['postal_code']);
+            $shippingAddress->setContactName($fullName);
+            $shippingAddress->setCity($data['city'] ?? 'Istanbul');
+            $shippingAddress->setCountry($data['country'] ?? 'Turkey');
+            $shippingAddress->setAddress($data['address'] ?? 'Adres');
+            $shippingAddress->setZipCode($data['postal_code'] ?? '34000');
             $request->setShippingAddress($shippingAddress);
 
             // Billing Address
             $billingAddress = new Address();
-            $billingAddress->setContactName($data['full_name']);
-            $billingAddress->setCity($data['city']);
-            $billingAddress->setCountry($data['country']);
-            $billingAddress->setAddress($data['address']);
-            $billingAddress->setZipCode($data['postal_code']);
+            $billingAddress->setContactName($fullName);
+            $billingAddress->setCity($data['city'] ?? 'Istanbul');
+            $billingAddress->setCountry($data['country'] ?? 'Turkey');
+            $billingAddress->setAddress($data['address'] ?? 'Adres');
+            $billingAddress->setZipCode($data['postal_code'] ?? '34000');
             $request->setBillingAddress($billingAddress);
 
             // Basket Items
@@ -136,7 +184,7 @@ class ApiService
             $request->setBasketItems($basketItems);
 
             // Make payment request
-            $payment = Payment::create($request, $this->options);
+            $payment = Payment::create($request, $options);
 
             if ($payment->getStatus() === 'success') {
                 return [
@@ -163,6 +211,17 @@ class ApiService
                 'errorCode' => 'EXCEPTION'
             ];
         }
+    }
+
+    /**
+     * Process saved card payment with iyzico (Non-3DS /payment/auth)
+     *
+     * @param  array  $data
+     * @return array|null
+     */
+    public function processSavedCardPayment(array $data): ?array
+    {
+        return $this->processCreditCardPayment($data);
     }
 
     /**

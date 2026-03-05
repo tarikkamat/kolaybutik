@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/i18n';
 import { Code2, FileCode, Github, Package } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface Library {
     name: string;
@@ -34,61 +35,65 @@ function SkeletonCard() {
 }
 
 export default function ClientLibrariesSection() {
+    const { t } = useI18n();
     const [starCounts, setStarCounts] = useState<Record<string, number | null>>(
         {},
     );
     const [loading, setLoading] = useState(true);
 
-    const libraries: Library[] = [
-        {
-            name: 'PHP',
-            repo: 'iyzipay-php',
-            description: 'iyzipay API PHP client',
-            link: 'https://github.com/iyzico/iyzipay-php',
-            icon: FileCode,
-            color: 'indigo',
-        },
-        {
-            name: '.NET',
-            repo: 'iyzipay-dotnet',
-            description: 'iyzipay API .NET client',
-            link: 'https://github.com/iyzico/iyzipay-dotnet',
-            icon: Code2,
-            color: 'purple',
-        },
-        {
-            name: 'Java',
-            repo: 'iyzipay-java',
-            description: 'iyzipay API Java client',
-            link: 'https://github.com/iyzico/iyzipay-java',
-            icon: Package,
-            color: 'amber',
-        },
-        {
-            name: 'Node.js',
-            repo: 'iyzipay-node',
-            description: 'iyzipay API Node.js client',
-            link: 'https://github.com/iyzico/iyzipay-node',
-            icon: FileCode,
-            color: 'emerald',
-        },
-        {
-            name: 'Python',
-            repo: 'iyzipay-python',
-            description: 'iyzipay API Python client',
-            link: 'https://github.com/iyzico/iyzipay-python',
-            icon: Code2,
-            color: 'blue',
-        },
-        {
-            name: 'Go',
-            repo: 'iyzipay-go',
-            description: 'iyzipay API Go client',
-            link: 'https://github.com/iyzico/iyzipay-go',
-            icon: Package,
-            color: 'rose',
-        },
-    ];
+    const libraries: Library[] = useMemo(
+        () => [
+            {
+                name: 'PHP',
+                repo: 'iyzipay-php',
+                description: t('landing.clientLibraries.library.php'),
+                link: 'https://github.com/iyzico/iyzipay-php',
+                icon: FileCode,
+                color: 'indigo',
+            },
+            {
+                name: '.NET',
+                repo: 'iyzipay-dotnet',
+                description: t('landing.clientLibraries.library.dotnet'),
+                link: 'https://github.com/iyzico/iyzipay-dotnet',
+                icon: Code2,
+                color: 'purple',
+            },
+            {
+                name: 'Java',
+                repo: 'iyzipay-java',
+                description: t('landing.clientLibraries.library.java'),
+                link: 'https://github.com/iyzico/iyzipay-java',
+                icon: Package,
+                color: 'amber',
+            },
+            {
+                name: 'Node.js',
+                repo: 'iyzipay-node',
+                description: t('landing.clientLibraries.library.node'),
+                link: 'https://github.com/iyzico/iyzipay-node',
+                icon: FileCode,
+                color: 'emerald',
+            },
+            {
+                name: 'Python',
+                repo: 'iyzipay-python',
+                description: t('landing.clientLibraries.library.python'),
+                link: 'https://github.com/iyzico/iyzipay-python',
+                icon: Code2,
+                color: 'blue',
+            },
+            {
+                name: 'Go',
+                repo: 'iyzipay-go',
+                description: t('landing.clientLibraries.library.go'),
+                link: 'https://github.com/iyzico/iyzipay-go',
+                icon: Package,
+                color: 'rose',
+            },
+        ],
+        [t],
+    );
 
     useEffect(() => {
         const fetchStarCounts = async () => {
@@ -98,7 +103,6 @@ export default function ClientLibrariesSection() {
                     const data = await response.json();
                     setStarCounts(data);
                 } else {
-                    // Fallback: Set all to null if API fails
                     const counts: Record<string, number | null> = {};
                     libraries.forEach((lib) => {
                         counts[lib.repo] = null;
@@ -107,7 +111,6 @@ export default function ClientLibrariesSection() {
                 }
             } catch (error) {
                 console.error('Error fetching GitHub stars:', error);
-                // Fallback: Set all to null on error
                 const counts: Record<string, number | null> = {};
                 libraries.forEach((lib) => {
                     counts[lib.repo] = null;
@@ -119,7 +122,7 @@ export default function ClientLibrariesSection() {
         };
 
         fetchStarCounts();
-    }, []);
+    }, [libraries]);
 
     const colorClasses = {
         indigo: {
@@ -167,10 +170,10 @@ export default function ClientLibrariesSection() {
             <div className="mx-auto max-w-7xl">
                 <div className="mb-16 text-center">
                     <h2 className="mb-4 text-3xl font-bold text-slate-900 sm:text-4xl dark:text-white">
-                        Client Kütüphaneleri
+                        {t('landing.clientLibraries.title')}
                     </h2>
                     <p className="mb-4 text-lg text-slate-600 dark:text-slate-400">
-                        Açık kaynak SDK'lar ile hızlı entegrasyon
+                        {t('landing.clientLibraries.subtitle')}
                     </p>
                     <a
                         href="https://github.com/iyzico"
@@ -179,18 +182,16 @@ export default function ClientLibrariesSection() {
                         className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
                     >
                         <Github className="h-5 w-5" />
-                        <span>Tüm kütüphaneleri GitHub'da görüntüle</span>
+                        <span>{t('landing.clientLibraries.viewAll')}</span>
                     </a>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {loading
-                        ? // Show skeleton loaders while loading
-                          libraries.map((_, index) => (
+                        ? libraries.map((_, index) => (
                               <SkeletonCard key={index} />
                           ))
-                        : // Show actual cards when loaded
-                          libraries.map((library, index) => {
+                        : libraries.map((library, index) => {
                               const Icon = library.icon;
                               const colors =
                                   colorClasses[

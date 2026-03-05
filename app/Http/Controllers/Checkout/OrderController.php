@@ -89,6 +89,19 @@ class OrderController extends Controller
             return $this->paymentInquiryService->retrievePayment($paymentId, null, 'quick_pwi');
         }
 
+        if ($paymentMethod === 'saved_card') {
+            $result = $this->paymentInquiryService->retrievePayment($paymentId, null, 'card_storage');
+            if ($result && ($result['status'] ?? '') === 'success') {
+                return $result;
+            }
+
+            return $this->paymentInquiryService->retrievePayment($paymentId, null, 'default');
+        }
+
+        if ($paymentMethod === 'credit_card') {
+            return $this->paymentInquiryService->retrievePayment($paymentId, null, 'default');
+        }
+
         $result = $this->paymentInquiryService->retrievePayment($paymentId, null, 'quick_pwi');
         if ($result && ($result['status'] ?? '') === 'success') {
             return $result;
@@ -97,4 +110,3 @@ class OrderController extends Controller
         return $this->paymentInquiryService->retrievePayment($paymentId, null, 'default');
     }
 }
-

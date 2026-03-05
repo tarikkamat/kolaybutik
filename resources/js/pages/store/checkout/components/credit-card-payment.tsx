@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/i18n';
 import { CreditCard } from 'lucide-react';
 import { PaymentForm } from './payment-form';
 
@@ -43,6 +44,8 @@ export function CreditCardPayment({
     onInstallmentChange,
     isLoadingInstallments = false,
 }: CreditCardPaymentProps) {
+    const { text } = useI18n();
+
     return (
         <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/50">
             <PaymentForm
@@ -62,27 +65,31 @@ export function CreditCardPayment({
                         className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                        3D ile Ödeme
+                        {text('3D ile Ödeme', 'Pay with 3D Secure')}
                     </span>
                 </label>
 
                 {/* Taksit Seçenekleri */}
                 {isLoadingInstallments && (
                     <div className="text-sm text-slate-600 dark:text-slate-400">
-                        Taksit seçenekleri yükleniyor...
+                        {text(
+                            'Taksit seçenekleri yükleniyor...',
+                            'Loading installment options...',
+                        )}
                     </div>
                 )}
                 {!isLoadingInstallments && installmentOptions.length > 0 && (
                     <div>
                         <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                            Taksit Seçenekleri
+                            {text('Taksit Seçenekleri', 'Installment Options')}
                         </label>
                         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                             {installmentOptions.map((option) => (
                                 <label
                                     key={option.installmentNumber}
                                     className={`cursor-pointer rounded-lg border-2 p-3 text-center transition-all ${
-                                        selectedInstallment === option.installmentNumber
+                                        selectedInstallment ===
+                                        option.installmentNumber
                                             ? 'border-indigo-600 bg-indigo-50 dark:border-indigo-500 dark:bg-indigo-900/20'
                                             : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600'
                                     }`}
@@ -91,7 +98,10 @@ export function CreditCardPayment({
                                         type="radio"
                                         name="installment"
                                         value={option.installmentNumber}
-                                        checked={selectedInstallment === option.installmentNumber}
+                                        checked={
+                                            selectedInstallment ===
+                                            option.installmentNumber
+                                        }
                                         onChange={() =>
                                             onInstallmentChange?.(
                                                 option.installmentNumber,
@@ -105,7 +115,10 @@ export function CreditCardPayment({
                                         {option.installmentNumber}x
                                     </div>
                                     <div className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-                                        ₺{parseFloat(option.installmentPrice).toFixed(2)}
+                                        ₺
+                                        {parseFloat(
+                                            option.installmentPrice,
+                                        ).toFixed(2)}
                                     </div>
                                 </label>
                             ))}
@@ -121,7 +134,9 @@ export function CreditCardPayment({
                     className="w-full"
                 >
                     <CreditCard className="mr-2 h-4 w-4" />
-                    {isSubmitting ? 'İşleniyor...' : 'Ödeme Yap'}
+                    {isSubmitting
+                        ? text('İşleniyor...', 'Processing...')
+                        : text('Ödeme Yap', 'Pay')}
                 </Button>
             </div>
         </div>

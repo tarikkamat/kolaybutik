@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/i18n';
 import { CartSummaryProps } from '@/types/cart';
 import { Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
@@ -9,15 +10,17 @@ export function CartSummary({
     shipping = 0,
     total,
 }: CartSummaryProps) {
+    const { text } = useI18n();
+
     return (
         <div className="sticky top-4 rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-800">
             <h2 className="mb-4 text-xl font-semibold text-slate-900 dark:text-white">
-                Sipariş Özeti
+                {text('Sipariş Özeti', 'Order Summary')}
             </h2>
             <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                     <span className="text-slate-600 dark:text-slate-400">
-                        Ara Toplam
+                        {text('Ara Toplam', 'Subtotal')}
                     </span>
                     <span className="font-medium text-slate-900 dark:text-white">
                         ₺{subtotal.toFixed(2)}
@@ -26,7 +29,7 @@ export function CartSummary({
                 {tax > 0 && (
                     <div className="flex justify-between text-sm">
                         <span className="text-slate-600 dark:text-slate-400">
-                            KDV
+                            {text('KDV', 'VAT')}
                         </span>
                         <span className="font-medium text-slate-900 dark:text-white">
                             ₺{tax.toFixed(2)}
@@ -36,7 +39,7 @@ export function CartSummary({
                 {shipping > 0 && (
                     <div className="flex justify-between text-sm">
                         <span className="text-slate-600 dark:text-slate-400">
-                            Kargo
+                            {text('Kargo', 'Shipping')}
                         </span>
                         <span className="font-medium text-slate-900 dark:text-white">
                             ₺{shipping.toFixed(2)}
@@ -46,7 +49,7 @@ export function CartSummary({
                 <div className="border-t border-slate-200 pt-3 dark:border-slate-700">
                     <div className="flex justify-between">
                         <span className="text-lg font-semibold text-slate-900 dark:text-white">
-                            Toplam
+                            {text('Toplam', 'Total')}
                         </span>
                         <span className="text-lg font-bold text-indigo-600">
                             ₺{total.toFixed(2)}
@@ -57,7 +60,7 @@ export function CartSummary({
 
             <Link href="/store/checkout" className="mt-6 block">
                 <Button size="lg" className="w-full">
-                    Ödemeye Geç
+                    {text('Ödemeye Geç', 'Proceed to Checkout')}
                     <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
             </Link>
@@ -66,7 +69,7 @@ export function CartSummary({
                 href="/store"
                 className="mt-3 block text-center text-sm text-indigo-600 hover:text-indigo-700"
             >
-                Alışverişe Devam Et
+                {text('Alışverişe Devam Et', 'Continue Shopping')}
             </Link>
         </div>
     );

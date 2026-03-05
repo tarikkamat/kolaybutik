@@ -1,13 +1,14 @@
 import { Button } from '@/components/ui/button';
-import { Wallet2 } from 'lucide-react';
-import { useState } from 'react';
+import { useI18n } from '@/i18n';
 import {
+    CreditCard,
     Hand,
+    Headphones,
     Shield,
     Wallet,
-    Headphones,
-    CreditCard,
+    Wallet2,
 } from 'lucide-react';
+import { useState } from 'react';
 
 interface PayWithIyzicoProps {
     formData: {
@@ -32,6 +33,7 @@ export function PayWithIyzico({
     isValid = false,
     initializeEndpoint = '/store/payment/iyzico/initialize',
 }: PayWithIyzicoProps) {
+    const { text } = useI18n();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -45,16 +47,17 @@ export function PayWithIyzico({
 
         try {
             // CSRF token'ı al
-            const csrfToken = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute('content') || '';
+            const csrfToken =
+                document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute('content') || '';
 
             const response = await fetch(initializeEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: JSON.stringify({
@@ -71,17 +74,32 @@ export function PayWithIyzico({
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.errorMessage || data.message || 'Bir hata oluştu');
+                throw new Error(
+                    data.errorMessage ||
+                        data.message ||
+                        text('Bir hata oluştu', 'An error occurred'),
+                );
             }
 
             if (data.success && data.data?.payWithIyzicoPageUrl) {
                 // Pay with iyzico URL'sine yönlendir
                 window.location.href = data.data.payWithIyzicoPageUrl;
             } else {
-                setError(data.errorMessage || data.message || 'Ödeme başlatılamadı');
+                setError(
+                    data.errorMessage ||
+                        data.message ||
+                        text(
+                            'Ödeme başlatılamadı',
+                            'Payment could not be initialized',
+                        ),
+                );
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Bir hata oluştu');
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : text('Bir hata oluştu', 'An error occurred'),
+            );
         } finally {
             setIsLoading(false);
         }
@@ -93,10 +111,16 @@ export function PayWithIyzico({
             <div className="mb-6">
                 <div className="mb-4 text-center">
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                        iyzico Güvencesiyle Kolayca Öde!
+                        {text(
+                            'iyzico Güvencesiyle Kolayca Öde!',
+                            'Pay Easily with iyzico Security!',
+                        )}
                     </h3>
                     <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                        iyzico ile Öde-Şimdi Kolay! Alışverişini ister iyzico bakiyenle, ister saklı kartınla, ister havale/EFT yöntemi ile kolayca öde; aklına takılan herhangi bir konuda 7/24 canlı destek al.
+                        {text(
+                            'iyzico ile Öde-Şimdi Kolay! Alışverişini ister iyzico bakiyenle, ister saklı kartınla, ister havale/EFT yöntemi ile kolayca öde; aklına takılan herhangi bir konuda 7/24 canlı destek al.',
+                            'Pay with iyzico, made easy. Complete your purchase with iyzico balance, saved cards, or bank transfer/EFT, and get 24/7 live support whenever you need it.',
+                        )}
                     </p>
                 </div>
 
@@ -107,7 +131,10 @@ export function PayWithIyzico({
                             <Hand className="h-6 w-6" />
                         </div>
                         <p className="text-xs font-semibold text-slate-900 dark:text-white">
-                            Kart / Bakiyenle Hızlı Ödeme
+                            {text(
+                                'Kart / Bakiyenle Hızlı Ödeme',
+                                'Fast Payment with Card / Balance',
+                            )}
                         </p>
                     </div>
 
@@ -116,7 +143,7 @@ export function PayWithIyzico({
                             <Shield className="h-6 w-6" />
                         </div>
                         <p className="text-xs font-semibold text-slate-900 dark:text-white">
-                            Korumalı Alışveriş
+                            {text('Korumalı Alışveriş', 'Protected Shopping')}
                         </p>
                     </div>
 
@@ -125,7 +152,10 @@ export function PayWithIyzico({
                             <Wallet className="h-6 w-6" />
                         </div>
                         <p className="text-xs font-semibold text-slate-900 dark:text-white">
-                            Bakiye ile Ödemende Anında İade
+                            {text(
+                                'Bakiye ile Ödemende Anında İade',
+                                'Instant Refunds for Balance Payments',
+                            )}
                         </p>
                     </div>
 
@@ -134,7 +164,7 @@ export function PayWithIyzico({
                             <Headphones className="h-6 w-6" />
                         </div>
                         <p className="text-xs font-semibold text-slate-900 dark:text-white">
-                            7/24 Canlı Destek
+                            {text('7/24 Canlı Destek', '24/7 Live Support')}
                         </p>
                     </div>
 
@@ -143,7 +173,7 @@ export function PayWithIyzico({
                             <CreditCard className="h-6 w-6" />
                         </div>
                         <p className="text-xs font-semibold text-slate-900 dark:text-white">
-                            Alışveriş Kredisi
+                            {text('Alışveriş Kredisi', 'Shopping Credit')}
                         </p>
                     </div>
                 </div>
@@ -152,7 +182,9 @@ export function PayWithIyzico({
             {/* Hata Mesajı */}
             {error && (
                 <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
-                    <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                    <p className="text-sm text-red-600 dark:text-red-400">
+                        {error}
+                    </p>
                 </div>
             )}
 
@@ -164,7 +196,9 @@ export function PayWithIyzico({
                 className="w-full"
             >
                 <Wallet2 className="mr-2 h-4 w-4" />
-                {isSubmitting || isLoading ? 'Yönlendiriliyor...' : 'Pay with iyzico ile Öde'}
+                {isSubmitting || isLoading
+                    ? text('Yönlendiriliyor...', 'Redirecting...')
+                    : text('Pay with iyzico ile Öde', 'Pay with iyzico')}
             </Button>
         </div>
     );

@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useI18n } from '@/i18n';
 import { Link } from '@inertiajs/react';
 import {
     CreditCard,
@@ -11,54 +12,49 @@ import {
 } from 'lucide-react';
 
 export default function AdditionalServicesSection() {
+    const { t } = useI18n();
+
     const services = [
         {
             icon: CreditCard,
-            title: 'Kart Saklama',
-            description:
-                'Müşterilerinizin kart bilgilerini güvenli bir şekilde saklayın. Tek tıkla hızlı ödeme.',
+            title: t('landing.services.cardStorage.title'),
+            description: t('landing.services.cardStorage.description'),
             color: 'denim',
         },
         {
             icon: FileText,
-            title: 'Raporlama',
-            description:
-                'Detaylı ödeme raporları ve finansal analizler. İşinizi veri ile yönetin.',
+            title: t('landing.services.reporting.title'),
+            description: t('landing.services.reporting.description'),
             color: 'bittersweet',
         },
         {
             icon: Webhook,
-            title: 'Webhook',
-            description:
-                'Gerçek zamanlı bildirimler. Ödeme durumlarını anında takip edin.',
+            title: t('landing.services.webhook.title'),
+            description: t('landing.services.webhook.description'),
             color: 'kaamaru',
         },
         {
             icon: RotateCcw,
-            title: 'İptal İade',
-            description:
-                'Kolay iptal ve iade işlemleri. Müşteri memnuniyeti için esnek çözümler.',
+            title: t('landing.services.refund.title'),
+            description: t('landing.services.refund.description'),
             color: 'denim',
         },
         {
             icon: TrendingUp,
-            title: 'Taksit Servisi',
-            description:
-                'Taksitli ödeme seçenekleri. Müşterilerinize esnek ödeme imkanı sunun.',
+            title: t('landing.services.installment.title'),
+            description: t('landing.services.installment.description'),
             color: 'bittersweet',
         },
         {
             icon: Hash,
-            title: 'Bin Servisi',
-            description:
-                'Kart numarasına göre banka ve kart tipi bilgilerini alın.',
+            title: t('landing.services.bin.title'),
+            description: t('landing.services.bin.description'),
             color: 'kaamaru',
         },
         {
             icon: Lock,
-            title: 'Signature',
-            description:
-                'API çağrılarınızın güvenliğini sağlamak için imza mekanizması.',
+            title: t('landing.services.signature.title'),
+            description: t('landing.services.signature.description'),
             color: 'denim',
         },
     ];
@@ -86,21 +82,21 @@ export default function AdditionalServicesSection() {
             <div className="mx-auto max-w-7xl">
                 <div className="mb-16 text-center">
                     <h2 className="mb-4 text-3xl font-bold text-slate-900 sm:text-4xl dark:text-white">
-                        İşinizi Kolaylaştıracak Çözümler
+                        {t('landing.services.title')}
                     </h2>
                     <p className="mb-4 text-lg text-slate-600 dark:text-slate-400">
-                        Ödeme deneyiminizi iyileştiren teknik servisleri inceleyin.{' '}
+                        {t('landing.services.subtitle')}{' '}
                         <Link
                             href="/services"
                             className="font-medium text-[color:var(--iyzico-denim)] underline underline-offset-2 hover:opacity-90 dark:text-[color:var(--iyzico-denim)]"
                         >
-                            Servisleri test et
+                            {t('landing.services.testServices')}
                         </Link>
                     </p>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {services.map((service, index) => {
+                    {services.map((service) => {
                         const Icon = service.icon;
                         const colors =
                             colorClasses[
@@ -108,7 +104,7 @@ export default function AdditionalServicesSection() {
                             ];
                         return (
                             <Card
-                                key={index}
+                                key={service.title}
                                 className="group border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800"
                             >
                                 <CardHeader>
@@ -118,7 +114,9 @@ export default function AdditionalServicesSection() {
                                         <Icon
                                             className={`h-6 w-6 ${colors.icon}`}
                                         />
-                                        <div className={`ms-2 font-semibold leading-none ${colors.icon}`}>
+                                        <div
+                                            className={`ms-2 leading-none font-semibold ${colors.icon}`}
+                                        >
                                             {service.title}
                                         </div>
                                     </div>

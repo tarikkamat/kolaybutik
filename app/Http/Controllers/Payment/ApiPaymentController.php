@@ -16,7 +16,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class ApiPaymentController extends Controller
@@ -44,7 +43,7 @@ class ApiPaymentController extends Controller
         }
 
         $result = $this->paymentService->processCreditCardPayment($data);
-        return $this->handlePaymentResult($request, $result, false);
+        return $this->handlePaymentResult($request, $result, false, 'credit_card');
     }
 
     /**
@@ -55,22 +54,24 @@ class ApiPaymentController extends Controller
         $data = $request->validated();
         $result = $this->paymentService->processSavedCardPayment($data);
 
-        return $this->handlePaymentResult($request, $result);
+        return $this->handlePaymentResult($request, $result, false, 'saved_card');
     }
 
     /**
-     * Get saved cards for authenticated user
+     * Get saved cards by cardUserKey
      */
     public function getSavedCards(Request $request): JsonResponse
     {
-        if (!Auth::check()) {
-            return response()->json(['cards' => []], 200);
-        }
+        $cardUserKey = $request->query('cardUserKey') ?? $request->input('cardUserKey');
+        $result = $this->paymentService->getSavedCards($cardUserKey);
 
-        $userId = Auth::id();
-        $cards = $this->paymentService->getSavedCards($userId);
-
-        return response()->json(['cards' => $cards ?? []]);
+        return response()->json([
+            'status' => $result['status'] ?? 'error',
+            'cards' => $result['cards'] ?? [],
+            'cardUserKey' => $result['cardUserKey'] ?? null,
+            'message' => $result['errorMessage'] ?? null,
+            'errorCode' => $result['errorCode'] ?? null,
+        ], 200);
     }
 
     /**
@@ -266,4 +267,3 @@ class ApiPaymentController extends Controller
         return $this->handleThreedsCallbackResult($request, $result);
     }
 }
-

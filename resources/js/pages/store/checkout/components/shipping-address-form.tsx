@@ -4,6 +4,7 @@ import {
     InputGroupAddon,
     InputGroupInput,
 } from '@/components/ui/input-group';
+import { useI18n } from '@/i18n';
 import { ShippingAddressFormProps } from '@/types/cart';
 import { Globe, Hash, Mail, MapPin, Phone, User, Wand2 } from 'lucide-react';
 
@@ -12,6 +13,8 @@ export function ShippingAddressForm({
     onInputChange,
     onAutoFill,
 }: ShippingAddressFormProps) {
+    const { text } = useI18n();
+
     return (
         <div>
             {onAutoFill && (
@@ -24,14 +27,14 @@ export function ShippingAddressForm({
                         className="gap-2"
                     >
                         <Wand2 className="h-4 w-4" />
-                        Otomatik Doldur
+                        {text('Otomatik Doldur', 'Auto Fill')}
                     </Button>
                 </div>
             )}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Ad Soyad *
+                        {text('Ad Soyad *', 'Full Name *')}
                     </label>
                     <InputGroup>
                         <InputGroupAddon>
@@ -43,14 +46,14 @@ export function ShippingAddressForm({
                             required
                             value={formData.full_name}
                             onChange={onInputChange}
-                            placeholder="Ad Soyad"
+                            placeholder={text('Ad Soyad', 'Full Name')}
                             hasAddon
                         />
                     </InputGroup>
                 </div>
                 <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        E-posta *
+                        {text('E-posta *', 'Email *')}
                     </label>
                     <InputGroup>
                         <InputGroupAddon>
@@ -69,7 +72,7 @@ export function ShippingAddressForm({
                 </div>
                 <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Telefon *
+                        {text('Telefon *', 'Phone *')}
                     </label>
                     <InputGroup>
                         <InputGroupAddon>
@@ -88,7 +91,7 @@ export function ShippingAddressForm({
                 </div>
                 <div className="sm:col-span-2">
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Adres *
+                        {text('Adres *', 'Address *')}
                     </label>
                     <InputGroup>
                         <InputGroupAddon>
@@ -100,14 +103,14 @@ export function ShippingAddressForm({
                             required
                             value={formData.address}
                             onChange={onInputChange}
-                            placeholder="Adres"
+                            placeholder={text('Adres', 'Address')}
                             hasAddon
                         />
                     </InputGroup>
                 </div>
                 <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Şehir *
+                        {text('Şehir *', 'City *')}
                     </label>
                     <InputGroup>
                         <InputGroupAddon>
@@ -119,14 +122,14 @@ export function ShippingAddressForm({
                             required
                             value={formData.city}
                             onChange={onInputChange}
-                            placeholder="Şehir"
+                            placeholder={text('Şehir', 'City')}
                             hasAddon
                         />
                     </InputGroup>
                 </div>
                 <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Posta Kodu *
+                        {text('Posta Kodu *', 'Postal Code *')}
                     </label>
                     <InputGroup>
                         <InputGroupAddon>
@@ -145,7 +148,7 @@ export function ShippingAddressForm({
                 </div>
                 <div className="sm:col-span-2">
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Ülke *
+                        {text('Ülke *', 'Country *')}
                     </label>
                     <InputGroup>
                         <InputGroupAddon>
@@ -158,7 +161,9 @@ export function ShippingAddressForm({
                             onChange={onInputChange}
                             className="flex h-9 w-full min-w-0 rounded-l-none rounded-r-md border border-l-0 border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                         >
-                            <option value="Türkiye">Türkiye</option>
+                            <option value="Türkiye">
+                                {text('Türkiye', 'Turkey')}
+                            </option>
                         </select>
                     </InputGroup>
                 </div>

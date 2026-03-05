@@ -108,6 +108,20 @@ export type PaymentMethod =
     | 'iyzico_quick'
     | 'saved_card';
 
+export interface SavedCard {
+    cardToken: string;
+    cardAlias?: string;
+    binNumber?: string;
+    lastFourDigits?: string;
+    cardType?: string;
+    cardAssociation?: string;
+    cardFamily?: string;
+    cardBankCode?: number;
+    cardBankName?: string;
+    expireMonth?: string;
+    expireYear?: string;
+}
+
 export interface PaymentOptionsProps {
     formData: {
         // Shipping Address
@@ -126,6 +140,8 @@ export interface PaymentOptionsProps {
         payment_method?: string;
         use_3d?: boolean;
         installment?: number;
+        card_user_key?: string;
+        card_token?: string;
     };
     onInputChange: (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -137,4 +153,10 @@ export interface PaymentOptionsProps {
     onSubmit?: () => void;
     isSubmitting?: boolean;
     isValid?: boolean;
+    savedCards?: SavedCard[];
+    isLoadingSavedCards?: boolean;
+    savedCardsError?: string | null;
+    onFetchSavedCards?: () => void;
+    onSavedCardSelect?: (cardToken: string) => void;
+    onCardUserKeyChange?: (value: string) => void;
 }

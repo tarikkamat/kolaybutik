@@ -1,22 +1,25 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-    AppWindow,
-    ArrowRight,
-    CheckCircle2,
-    CreditCard,
-    Wallet,
-    ChevronDown,
-} from 'lucide-react';
-import { Link } from '@inertiajs/react';
-import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useI18n } from '@/i18n';
+import { Link } from '@inertiajs/react';
+import {
+    AppWindow,
+    ArrowRight,
+    CheckCircle2,
+    ChevronDown,
+    CreditCard,
+    Wallet,
+} from 'lucide-react';
 
 export default function HeroSection() {
+    const { t } = useI18n();
+
     return (
         <section className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8 lg:py-32">
             <div className="absolute inset-0 -z-10">
@@ -29,18 +32,15 @@ export default function HeroSection() {
                     <div className="text-center lg:text-left">
                         <Badge
                             variant="secondary"
-                            className="mb-4 chip-success"
+                            className="chip-success mb-4"
                         >
-                            iyzico Entegrasyon Çözümleri
+                            {t('landing.hero.badge')}
                         </Badge>
                         <h1 className="mb-6 text-4xl font-bold tracking-tight text-[color:var(--iyzico-denim)] sm:text-5xl lg:text-6xl">
-                            iyzico ile Ödeme Almanın En Kolay Yolu
+                            {t('landing.hero.title')}
                         </h1>
                         <p className="mb-8 text-lg text-slate-600 dark:text-slate-400">
-                            iyzico Sanal POS, iyzico checkout form veya iyzico
-                            ile Öde arasından işletmenize en uygun entegrasyon
-                            yöntemini seçin. Kredi kartı, banka kartı ve dijital
-                            cüzdan ile ödemelerinizi kolay ve güvenli alın.
+                            {t('landing.hero.description')}
                         </p>
                         <div className="flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
                             <a
@@ -48,47 +48,44 @@ export default function HeroSection() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                <Button
-                                    size="lg"
-                                >
-                                    Dokümantasyonu İncele
+                                <Button size="lg">
+                                    {t('common.viewDocs')}
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </a>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button size="lg" variant="outline">
-                                        Canlı Demo
+                                        {t('common.liveDemo')}
                                         <ChevronDown className="ml-2 h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem asChild>
-                                        <Link href="/store">Test Mağaza</Link>
+                                        <Link href="/store">
+                                            {t('common.testStore')}
+                                        </Link>
                                     </DropdownMenuItem>
-                                    {/** TODO:
                                     <DropdownMenuItem asChild>
-                                        <Link href="/subscription">Test Abonelik</Link>
-                                    </DropdownMenuItem>  */}
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/services/iyzico-link">Test iyziLink</Link>
+                                        <Link href="/services/iyzico-link">
+                                            {t('common.testIyziLink')}
+                                        </Link>
                                     </DropdownMenuItem>
-
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
                         <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-600 lg:justify-start dark:text-slate-400">
                             <div className="flex items-center gap-2">
                                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                                <span>Hızlı Entegrasyon</span>
+                                <span>{t('landing.hero.fastIntegration')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                                <span>Kolay Kurulum</span>
+                                <span>{t('landing.hero.easySetup')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                                <span>7/24 Destek</span>
+                                <span>{t('landing.hero.support247')}</span>
                             </div>
                         </div>
                     </div>
@@ -102,13 +99,12 @@ export default function HeroSection() {
                                     </div>
                                     <div>
                                         <div className="text-sm font-semibold text-[color:var(--iyzico-denim)]">
-                                            iyzico Sanal POS
+                                            {t('landing.hero.cards.pos.title')}
                                         </div>
                                         <div className="text-xs text-slate-600 dark:text-slate-400">
-                                            Sanal POS’a doğrudan API üzerinden
-                                            entegre olun. Kartlı ödemelerde
-                                            Non-3DS ve 3DS işlemler için tam
-                                            kontrol sağlayın.
+                                            {t(
+                                                'landing.hero.cards.pos.description',
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -118,15 +114,14 @@ export default function HeroSection() {
                                     </div>
                                     <div>
                                         <div className="text-sm font-semibold text-[color:var(--iyzico-bittersweet)]">
-                                            iyzico Checkout Form
+                                            {t(
+                                                'landing.hero.cards.checkout.title',
+                                            )}
                                         </div>
                                         <div className="text-xs text-slate-600 dark:text-slate-400">
-                                            Kart ve iyzico ile Öde seçeneklerini
-                                            tek ekranda sunun. PCI DSS
-                                            yükümlülüklerinden muaf olun, tek
-                                            bir servis entegrasyonu ile hızlı
-                                            bir şekilde şekilde ödeme almaya
-                                            başlayın.
+                                            {t(
+                                                'landing.hero.cards.checkout.description',
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -136,15 +131,12 @@ export default function HeroSection() {
                                     </div>
                                     <div>
                                         <div className="text-sm font-semibold text-[color:var(--kaamaru)]">
-                                            iyzico ile Öde
+                                            {t('landing.hero.cards.pwi.title')}
                                         </div>
                                         <div className="text-xs text-slate-600 dark:text-slate-400">
-                                            Hazır ödeme formumuzu sitenize
-                                            kolayca ekleyin. Minimum geliştirme
-                                            ile daha hızlı ödeme sağlayın.
-                                            Kullanıcının bakiyesi ile, kayıtlı
-                                            kartı ile, havale eft çözümünü tek
-                                            ekranda sunun.
+                                            {t(
+                                                'landing.hero.cards.pwi.description',
+                                            )}
                                         </div>
                                     </div>
                                 </div>

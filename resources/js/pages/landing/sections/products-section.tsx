@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from '@inertiajs/react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useI18n } from '@/i18n';
 import {
     CreditCard,
     Link as LinkIcon,
@@ -10,47 +10,43 @@ import {
 } from 'lucide-react';
 
 export default function ProductsSection() {
+    const { t } = useI18n();
+
     const products = [
         {
             icon: CreditCard,
-            title: 'Online Ödeme',
-            description:
-                'Kredi kartı, banka kartı ve dijital cüzdan ile internet satışlarınızda güvenli ödeme alın.',
+            title: t('landing.products.onlinePayment.title'),
+            description: t('landing.products.onlinePayment.description'),
             color: 'denim',
         },
         {
             icon: Store,
-            title: 'Pazaryeri',
-            description:
-                'Çoklu satıcı yapısı ile pazaryeri modelinizi oluşturun; komisyon ve ödemelerinizi otomatik yönetin.',
+            title: t('landing.products.marketplace.title'),
+            description: t('landing.products.marketplace.description'),
             color: 'bittersweet',
         },
         {
             icon: Repeat,
-            title: 'Abonelik Yöntemi',
-            description:
-                'Tekrarlayan ödemeler için abonelik yöntemiyle ödeme alın. Otomatik yenileme, plan değişikliği ve iptal işlemlerini tek panelden yönetin.',
+            title: t('landing.products.subscription.title'),
+            description: t('landing.products.subscription.description'),
             color: 'kaamaru',
         },
         {
             icon: Wallet,
-            title: 'Korumalı Havale/EFT',
-            description:
-                'Havale/EFT ile ödeme alın, ödeme onaylandıktan sonra ürün/hizmet teslim edilsin.',
+            title: t('landing.products.protectedTransfer.title'),
+            description: t('landing.products.protectedTransfer.description'),
             color: 'denim',
         },
         {
             icon: LinkIcon,
-            title: 'iyzico Link Yöntemi',
-            description:
-                'Ürün veya tutar linki oluşturarak müşterilerinizle paylaşın, dilediğiniz anda güvenle ödeme alın.',
+            title: t('landing.products.link.title'),
+            description: t('landing.products.link.description'),
             color: 'bittersweet',
         },
         {
             icon: ShoppingCart,
-            title: 'Alışveriş Kredisi',
-            description:
-                'Müşterilerinize banka kredisi ile taksitli alışveriş imkânı sunun, satışlarınızı artırın.',
+            title: t('landing.products.shoppingLoan.title'),
+            description: t('landing.products.shoppingLoan.description'),
             color: 'kaamaru',
         },
     ];
@@ -78,22 +74,25 @@ export default function ProductsSection() {
             <div className="mx-auto max-w-7xl">
                 <div className="mb-16 text-center">
                     <h2 className="mb-4 text-3xl font-bold text-slate-900 sm:text-4xl dark:text-white">
-                        Kullanabileceğiniz Ürünler
+                        {t('landing.products.title')}
                     </h2>
                     <p className="text-lg text-slate-600 dark:text-slate-400">
-                        İş modelinize en uygun ürünleri keşfedin.
+                        {t('landing.products.subtitle')}
                     </p>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {products.map((product, index) => {
+                    {products.map((product) => {
                         const Icon = product.icon;
-                            const colors =
+                        const colors =
                             colorClasses[
                                 product.color as keyof typeof colorClasses
                             ];
                         return (
-                                <Card className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
+                            <Card
+                                key={product.title}
+                                className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800"
+                            >
                                 <CardHeader>
                                     <div
                                         className={`inline-flex items-center rounded-lg p-3 ${colors.bg}`}
@@ -101,7 +100,9 @@ export default function ProductsSection() {
                                         <Icon
                                             className={`h-6 w-6 ${colors.icon}`}
                                         />
-                                        <div className={`ms-2 font-semibold leading-none ${colors.icon}`}>
+                                        <div
+                                            className={`ms-2 leading-none font-semibold ${colors.icon}`}
+                                        >
                                             {product.title}
                                         </div>
                                     </div>

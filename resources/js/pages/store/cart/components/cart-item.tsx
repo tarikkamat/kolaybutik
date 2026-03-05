@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { useI18n } from '@/i18n';
 import { CartItemProps } from '@/types/cart';
 import { Link } from '@inertiajs/react';
 import { Minus, Plus, Trash2 } from 'lucide-react';
@@ -11,6 +12,7 @@ export function CartItem({
     onUpdateQuantity,
     onRemoveItem,
 }: CartItemProps) {
+    const { text } = useI18n();
     const itemPrice = item.product.sale_price || item.product.price;
 
     return (
@@ -37,7 +39,7 @@ export function CartItem({
                             {item.product.name}
                         </Link>
                         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                            ₺{itemPrice.toFixed(2)} / adet
+                            ₺{itemPrice.toFixed(2)} / {text('adet', 'pcs')}
                         </p>
                     </div>
 

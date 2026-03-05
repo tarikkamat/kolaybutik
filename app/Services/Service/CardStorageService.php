@@ -17,10 +17,11 @@ class CardStorageService
 
     public function __construct()
     {
+        $cardStorageConfig = config('iyzipay.card_storage');
         $this->options = new Options();
-        $this->options->setApiKey(config('iyzipay.api_key'));
-        $this->options->setSecretKey(config('iyzipay.secret_key'));
-        $this->options->setBaseUrl(config('iyzipay.base_url'));
+        $this->options->setApiKey($cardStorageConfig['api_key']);
+        $this->options->setSecretKey($cardStorageConfig['secret_key']);
+        $this->options->setBaseUrl($cardStorageConfig['base_url']);
     }
 
     /**
@@ -194,4 +195,3 @@ class CardStorageService
         }
     }
 }
-

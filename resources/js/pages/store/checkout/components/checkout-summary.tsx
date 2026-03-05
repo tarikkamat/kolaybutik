@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n';
 import { CheckoutSummaryProps } from '@/types/cart';
 
 export function CheckoutSummary({
@@ -12,6 +13,8 @@ export function CheckoutSummary({
     selectedInstallment?: number;
     installmentOptions?: any[];
 }) {
+    const { text } = useI18n();
+
     // Seçili taksit bilgisini bul
     const selectedOption = installmentOptions.find(
         (opt) => opt.installmentNumber === selectedInstallment,
@@ -27,7 +30,7 @@ export function CheckoutSummary({
     return (
         <div className="sticky top-4 rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-800">
             <h2 className="mb-4 text-xl font-semibold text-slate-900 dark:text-white">
-                Sipariş Özeti
+                {text('Sipariş Özeti', 'Order Summary')}
             </h2>
             <div className="mb-4 space-y-3">
                 {items.map((item) => (
@@ -47,7 +50,7 @@ export function CheckoutSummary({
                                 {item.product.name}
                             </p>
                             <p className="text-slate-600 dark:text-slate-400">
-                                {item.quantity} adet
+                                {item.quantity} {text('adet', 'pcs')}
                             </p>
                         </div>
                         <span className="font-medium text-slate-900 dark:text-white">
@@ -59,7 +62,7 @@ export function CheckoutSummary({
             <div className="space-y-3 border-t border-slate-200 pt-4 dark:border-slate-700">
                 <div className="flex justify-between text-sm">
                     <span className="text-slate-600 dark:text-slate-400">
-                        Ara Toplam
+                        {text('Ara Toplam', 'Subtotal')}
                     </span>
                     <span className="font-medium text-slate-900 dark:text-white">
                         ₺{subtotal.toFixed(2)}
@@ -68,7 +71,7 @@ export function CheckoutSummary({
                 {tax > 0 && (
                     <div className="flex justify-between text-sm">
                         <span className="text-slate-600 dark:text-slate-400">
-                            KDV
+                            {text('KDV', 'VAT')}
                         </span>
                         <span className="font-medium text-slate-900 dark:text-white">
                             ₺{tax.toFixed(2)}
@@ -78,7 +81,7 @@ export function CheckoutSummary({
                 {shipping > 0 && (
                     <div className="flex justify-between text-sm">
                         <span className="text-slate-600 dark:text-slate-400">
-                            Kargo
+                            {text('Kargo', 'Shipping')}
                         </span>
                         <span className="font-medium text-slate-900 dark:text-white">
                             ₺{shipping.toFixed(2)}
@@ -88,7 +91,8 @@ export function CheckoutSummary({
                 {selectedInstallment > 1 && monthlyPayment && (
                     <div className="flex justify-between text-sm">
                         <span className="text-slate-600 dark:text-slate-400">
-                            Aylık Ödeme ({selectedInstallment}x)
+                            {text('Aylık Ödeme', 'Monthly Payment')} (
+                            {selectedInstallment}x)
                         </span>
                         <span className="font-medium text-slate-900 dark:text-white">
                             ₺{monthlyPayment.toFixed(2)}
@@ -99,8 +103,8 @@ export function CheckoutSummary({
                     <div className="flex justify-between">
                         <span className="text-lg font-semibold text-slate-900 dark:text-white">
                             {selectedInstallment > 1
-                                ? 'Toplam Tutar'
-                                : 'Toplam'}
+                                ? text('Toplam Tutar', 'Total Amount')
+                                : text('Toplam', 'Total')}
                         </span>
                         <span className="text-lg font-bold text-indigo-600">
                             ₺{totalWithInstallment.toFixed(2)}
@@ -108,7 +112,8 @@ export function CheckoutSummary({
                     </div>
                     {selectedInstallment > 1 && (
                         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                            {selectedInstallment} taksit ile ödeme
+                            {selectedInstallment}{' '}
+                            {text('taksit ile ödeme', 'installments payment')}
                         </p>
                     )}
                 </div>

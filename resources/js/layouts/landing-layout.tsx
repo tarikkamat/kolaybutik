@@ -1,13 +1,14 @@
-import { Head, Link } from '@inertiajs/react';
-import React, { useEffect, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-// import ChatbotSidebar from '@/components/chatbot/chatbot-sidebar';
+import { useI18n } from '@/i18n';
+import { Head, Link } from '@inertiajs/react';
+import { ChevronDown } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 interface LegalPageLayoutProps {
     title: string;
@@ -19,15 +20,14 @@ export default function LandingLayout({
     children,
 }: LegalPageLayoutProps) {
     const [showNavbar, setShowNavbar] = useState(true);
+    const { t } = useI18n();
 
     useEffect(() => {
         const handleScroll = () => {
-            // Sayfa en üstteyse veya 100px'den fazla scroll yapıldıysa navbar'ı göster
             const scrollY = window.scrollY;
             setShowNavbar(scrollY === 0 || scrollY > 100);
         };
 
-        // İlk yüklemede scroll pozisyonunu kontrol et
         handleScroll();
 
         window.addEventListener('scroll', handleScroll);
@@ -37,9 +37,7 @@ export default function LandingLayout({
     return (
         <>
             <Head title={title} />
-            {/* NAV ve FOOTER ile birebir uyumlu arka plan */}
             <div className="min-h-screen bg-gradient-to-b from-white to-white dark:from-slate-900 dark:to-slate-900">
-                {/* Navigation */}
                 <nav
                     className={`fixed top-0 right-0 left-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-sm transition-transform duration-300 dark:border-slate-800 dark:bg-slate-900/80 ${
                         showNavbar ? 'translate-y-0' : '-translate-y-full'
@@ -56,55 +54,53 @@ export default function LandingLayout({
                                     />
                                 </Link>
                             </div>
-                            <div className="hidden items-center gap-6 md:flex">
-                                <Link
-                                    href="#payment-methods"
-                                    className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
-                                >
-                                    Ödeme Yöntemleri
-                                </Link>
-                                <Link
-                                    href="#products"
-                                    className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
-                                >
-                                    Çözümler
-                                </Link>
-                                <Link
-                                    href="#services"
-                                    className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
-                                >
-                                    Faydalı Servisler
-                                </Link>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger className="flex items-center gap-1 rounded-md bg-[color:var(--button-bg)] px-4 py-2 text-sm font-medium text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)]">
-                                        Canlı Demo
-                                        <ChevronDown className="h-4 w-4" />
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem asChild>
-                                            <Link href="/store">Test Mağaza</Link>
-                                        </DropdownMenuItem>
-                                        {/** TODO:
-                                        <DropdownMenuItem asChild>
-                                            <Link href="/subscription">Test Abonelik</Link>
-                                        </DropdownMenuItem>*/}
-                                        <DropdownMenuItem asChild>
-                                            <Link href="/services/iyzico-link">Test iyziLink</Link>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                            <div className="flex items-center gap-3">
+                                <div className="hidden items-center gap-6 md:flex">
+                                    <Link
+                                        href="#payment-methods"
+                                        className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+                                    >
+                                        {t('landing.nav.paymentMethods')}
+                                    </Link>
+                                    <Link
+                                        href="#products"
+                                        className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+                                    >
+                                        {t('landing.nav.solutions')}
+                                    </Link>
+                                    <Link
+                                        href="#services"
+                                        className="text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+                                    >
+                                        {t('landing.nav.helpfulServices')}
+                                    </Link>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger className="flex items-center gap-1 rounded-md bg-[color:var(--button-bg)] px-4 py-2 text-sm font-medium text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)]">
+                                            {t('common.liveDemo')}
+                                            <ChevronDown className="h-4 w-4" />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem asChild>
+                                                <Link href="/store">
+                                                    {t('common.testStore')}
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem asChild>
+                                                <Link href="/services/iyzico-link">
+                                                    {t('common.testIyziLink')}
+                                                </Link>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                                <LanguageSwitcher />
                             </div>
                         </div>
                     </div>
                 </nav>
 
-                {/* Main Content */}
                 <main className="flex-1">{children}</main>
 
-                {/* Chatbot Sidebar
-                <ChatbotSidebar /> */}
-
-                {/* Footer */}
                 <footer className="border-t border-slate-200 bg-white px-4 py-12 dark:border-slate-800 dark:bg-slate-900">
                     <div className="mx-auto max-w-7xl">
                         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -117,15 +113,12 @@ export default function LandingLayout({
                                     </Link>
                                 </div>
                                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                                    iyzico entegrasyon çözümleri ile ödeme
-                                    altyapınızı güçlendirin. API to API,
-                                    Checkout Form ve Pay with iyzico
-                                    seçenekleri.
+                                    {t('landing.footer.description')}
                                 </p>
                             </div>
                             <div>
                                 <h4 className="mb-4 font-semibold text-slate-900 dark:text-white">
-                                    Dokümantasyon
+                                    {t('landing.footer.documentation')}
                                 </h4>
                                 <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                     <li>
@@ -135,7 +128,7 @@ export default function LandingLayout({
                                             rel="noopener noreferrer"
                                             className="hover:text-indigo-600"
                                         >
-                                            API Dokümantasyonu
+                                            {t('landing.footer.apiDocs')}
                                         </a>
                                     </li>
                                     <li>
@@ -145,7 +138,9 @@ export default function LandingLayout({
                                             rel="noopener noreferrer"
                                             className="hover:text-indigo-600"
                                         >
-                                            Entegrasyon Rehberi
+                                            {t(
+                                                'landing.footer.integrationGuide',
+                                            )}
                                         </a>
                                     </li>
                                     <li>
@@ -153,14 +148,14 @@ export default function LandingLayout({
                                             href="mailto:entegrasyon@iyzico.com"
                                             className="hover:text-indigo-600"
                                         >
-                                            Destek
+                                            {t('landing.footer.support')}
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                             <div>
                                 <h4 className="mb-4 font-semibold text-slate-900 dark:text-white">
-                                    Kaynaklar
+                                    {t('landing.footer.resources')}
                                 </h4>
                                 <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                     <li>
@@ -170,7 +165,7 @@ export default function LandingLayout({
                                             rel="noopener noreferrer"
                                             className="hover:text-indigo-600"
                                         >
-                                            iyzico Ana Sayfa
+                                            {t('landing.footer.homepage')}
                                         </a>
                                     </li>
                                     <li>
@@ -180,7 +175,9 @@ export default function LandingLayout({
                                             rel="noopener noreferrer"
                                             className="hover:text-indigo-600"
                                         >
-                                            Geliştirici Portalı
+                                            {t(
+                                                'landing.footer.developerPortal',
+                                            )}
                                         </a>
                                     </li>
                                     <li>
@@ -190,14 +187,16 @@ export default function LandingLayout({
                                             rel="noopener noreferrer"
                                             className="hover:text-indigo-600"
                                         >
-                                            GitHub Kütüphaneleri
+                                            {t(
+                                                'landing.footer.githubLibraries',
+                                            )}
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                             <div>
                                 <h4 className="mb-4 font-semibold text-slate-900 dark:text-white">
-                                    Çözümler
+                                    {t('landing.footer.solutions')}
                                 </h4>
                                 <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                     <li>
@@ -205,7 +204,7 @@ export default function LandingLayout({
                                             href="#payment-methods"
                                             className="hover:text-indigo-600"
                                         >
-                                            Ödeme Yöntemleri
+                                            {t('landing.nav.paymentMethods')}
                                         </Link>
                                     </li>
                                     <li>
@@ -213,7 +212,7 @@ export default function LandingLayout({
                                             href="#products"
                                             className="hover:text-indigo-600"
                                         >
-                                            Kullanabileceğiniz Ürünler
+                                            {t('landing.footer.products')}
                                         </Link>
                                     </li>
                                     <li>
@@ -221,16 +220,14 @@ export default function LandingLayout({
                                             href="#services"
                                             className="hover:text-indigo-600"
                                         >
-                                            İşinizi Kolaylaştıracak Çözümler
+                                            {t('landing.footer.workSolutions')}
                                         </Link>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                         <div className="mt-12 border-t border-slate-200 pt-8 text-center text-sm text-slate-600 dark:border-slate-800 dark:text-slate-400">
-                            <p>
-                                &copy; 2025 Kolay Butik. Tüm hakları saklıdır.
-                            </p>
+                            <p>{t('landing.footer.copyright')}</p>
                         </div>
                     </div>
                 </footer>

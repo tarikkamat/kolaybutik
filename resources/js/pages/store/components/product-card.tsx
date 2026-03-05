@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { useI18n } from '@/i18n';
 import { Product } from '@/types/models';
 import { Link } from '@inertiajs/react';
 import { ShoppingCart } from 'lucide-react';
@@ -15,6 +16,8 @@ export function ProductCard({
     isAddingToCart,
     onAddToCart,
 }: ProductCardProps) {
+    const { text } = useI18n();
+
     return (
         <div className="group relative rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-lg dark:border-slate-800 dark:bg-slate-800">
             <Link href={`/store/products/${product.slug}`} className="block">
@@ -41,13 +44,16 @@ export function ProductCard({
                                     <>
                                         <Spinner />
                                         <span className="ml-2">
-                                            Sepete Ekleniyor
+                                            {text(
+                                                'Sepete Ekleniyor',
+                                                'Adding to Cart',
+                                            )}
                                         </span>
                                     </>
                                 ) : (
                                     <>
                                         <ShoppingCart className="mr-2 h-4 w-4" />
-                                        Sepete Ekle
+                                        {text('Sepete Ekle', 'Add to Cart')}
                                     </>
                                 )}
                             </Button>

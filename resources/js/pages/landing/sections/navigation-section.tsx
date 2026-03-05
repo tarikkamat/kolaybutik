@@ -1,7 +1,10 @@
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/i18n';
 import { Link } from '@inertiajs/react';
 
 export default function NavigationSection() {
+    const { t } = useI18n();
+
     return (
         <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -13,14 +16,16 @@ export default function NavigationSection() {
                     </div>
                     <div className="flex items-center gap-4">
                         <Link href="#">
-                            <Button variant="ghost">Giriş Yap</Button>
+                            <Button variant="ghost">
+                                {t('common.signIn')}
+                            </Button>
                         </Link>
                         <a
                             href="https://www.iyzico.com"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            <Button>Hesap Oluştur</Button>
+                            <Button>{t('common.createAccount')}</Button>
                         </a>
                     </div>
                 </div>

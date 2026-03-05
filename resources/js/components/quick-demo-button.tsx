@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/i18n';
 import { Link } from '@inertiajs/react';
 
 interface QuickDemoButtonProps {
@@ -10,27 +11,27 @@ interface QuickDemoButtonProps {
 export function QuickDemoButton({
     href,
     color = 'indigo',
-    children = 'Hızlı Dene',
+    children,
 }: QuickDemoButtonProps) {
+    const { t } = useI18n();
+
     const colorClasses = {
         indigo: {
-            button:
-                'animate-pulse-glow-kaamaru border-[color:var(--button-border)] bg-[color:var(--button-bg)] text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)] hover:text-[color:var(--button-text)]',
+            button: 'animate-pulse-glow-kaamaru border-[color:var(--button-border)] bg-[color:var(--button-bg)] text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)] hover:text-[color:var(--button-text)]',
             shimmer: 'animate-shimmer-kaamaru',
         },
         emerald: {
-            button:
-                'animate-pulse-glow-kaamaru border-[color:var(--button-border)] bg-[color:var(--button-bg)] text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)] hover:text-[color:var(--button-text)]',
+            button: 'animate-pulse-glow-kaamaru border-[color:var(--button-border)] bg-[color:var(--button-bg)] text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)] hover:text-[color:var(--button-text)]',
             shimmer: 'animate-shimmer-kaamaru',
         },
         amber: {
-            button:
-                'animate-pulse-glow-kaamaru border-[color:var(--button-border)] bg-[color:var(--button-bg)] text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)] hover:text-[color:var(--button-text)]',
+            button: 'animate-pulse-glow-kaamaru border-[color:var(--button-border)] bg-[color:var(--button-bg)] text-[color:var(--button-text)] hover:bg-[color:var(--button-bg-hover)] hover:text-[color:var(--button-text)]',
             shimmer: 'animate-shimmer-kaamaru',
         },
     };
 
     const classes = colorClasses[color];
+    const label = children ?? t('common.tryNow');
 
     return (
         <>
@@ -69,11 +70,13 @@ export function QuickDemoButton({
             `}</style>
             <Link href={href}>
                 <Button
-                    className={`w-full ${classes.button} hover:shadow-lg transition-all duration-300 relative overflow-hidden`}
+                    className={`w-full ${classes.button} relative overflow-hidden transition-all duration-300 hover:shadow-lg`}
                     variant="outline"
                 >
-                    <span className="relative z-10 text-white">{children}</span>
-                    <span className={`absolute inset-0 ${classes.shimmer}`}></span>
+                    <span className="relative z-10 text-white">{label}</span>
+                    <span
+                        className={`absolute inset-0 ${classes.shimmer}`}
+                    ></span>
                 </Button>
             </Link>
         </>

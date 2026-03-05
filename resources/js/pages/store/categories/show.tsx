@@ -1,4 +1,5 @@
 import { useAddToCart } from '@/hooks/use-add-to-cart';
+import { useI18n } from '@/i18n';
 import StoreLayout from '@/layouts/store-layout';
 import { PaginatedData } from '@/types';
 import { Category, Product } from '@/types/models';
@@ -17,6 +18,7 @@ export default function CategoryShow({
     relatedCategories,
 }: CategoryShowProps) {
     const { addingToCart, handleAddToCart } = useAddToCart();
+    const { text } = useI18n();
 
     return (
         <StoreLayout title={category.name}>
@@ -30,7 +32,7 @@ export default function CategoryShow({
                                 href="/store"
                                 className="text-slate-600 hover:text-indigo-600 dark:text-slate-400"
                             >
-                                Mağaza
+                                {text('Mağaza', 'Store')}
                             </Link>
                         </li>
                         <li className="text-slate-400">/</li>
@@ -39,7 +41,7 @@ export default function CategoryShow({
                                 href="/store/categories"
                                 className="text-slate-600 hover:text-indigo-600 dark:text-slate-400"
                             >
-                                Kategoriler
+                                {text('Kategoriler', 'Categories')}
                             </Link>
                         </li>
                         <li className="text-slate-400">/</li>
@@ -56,7 +58,8 @@ export default function CategoryShow({
                     </h1>
                     {products.total !== undefined && (
                         <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">
-                            {products.total} ürün bulundu
+                            {products.total}{' '}
+                            {text('ürün bulundu', 'products found')}
                         </p>
                     )}
                 </div>
@@ -100,7 +103,10 @@ export default function CategoryShow({
                 ) : (
                     <div className="rounded-lg border border-slate-200 bg-white p-12 text-center dark:border-slate-800 dark:bg-slate-800">
                         <p className="text-slate-600 dark:text-slate-400">
-                            Bu kategoride ürün bulunamadı.
+                            {text(
+                                'Bu kategoride ürün bulunamadı.',
+                                'No products found in this category.',
+                            )}
                         </p>
                     </div>
                 )}
@@ -109,7 +115,7 @@ export default function CategoryShow({
                 {relatedCategories.length > 0 && (
                     <div className="mt-12">
                         <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
-                            Diğer Kategoriler
+                            {text('Diğer Kategoriler', 'Other Categories')}
                         </h2>
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
                             {relatedCategories.map((relatedCategory) => (

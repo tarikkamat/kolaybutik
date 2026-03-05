@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/i18n';
 import { LucideIcon } from 'lucide-react';
 
 interface OtherPaymentMethodProps {
@@ -18,10 +19,15 @@ export function OtherPaymentMethod({
     isSubmitting = false,
     isValid = false,
 }: OtherPaymentMethodProps) {
+    const { text } = useI18n();
+
     return (
         <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/50">
             <p className="text-sm text-slate-600 dark:text-slate-400">
-                {title} özelliği yakında eklenecek.
+                {text(
+                    `${title} özelliği yakında eklenecek.`,
+                    `${title} feature will be added soon.`,
+                )}
             </p>
             {showPayButton && (
                 <div className="mt-4">
@@ -32,7 +38,9 @@ export function OtherPaymentMethod({
                         className="w-full"
                     >
                         <Icon className="mr-2 h-4 w-4" />
-                        {isSubmitting ? 'İşleniyor...' : 'Ödeme Yap'}
+                        {isSubmitting
+                            ? text('İşleniyor...', 'Processing...')
+                            : text('Ödeme Yap', 'Pay')}
                     </Button>
                 </div>
             )}

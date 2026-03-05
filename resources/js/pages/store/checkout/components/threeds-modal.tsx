@@ -5,6 +5,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useI18n } from '@/i18n';
 import { Lock } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -25,6 +26,7 @@ export function ThreedsModal({
     onCallback,
     onClose,
 }: ThreedsModalProps) {
+    const { text } = useI18n();
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const [decodedHtml, setDecodedHtml] = useState<string>('');
 
@@ -45,7 +47,12 @@ export function ThreedsModal({
                 console.log('Decoded HTML:', decoded.substring(0, 200));
             } catch (error) {
                 console.error('HTML decode hatası:', error);
-                alert('3DS sayfası yüklenirken bir hata oluştu.');
+                alert(
+                    text(
+                        '3DS sayfası yüklenirken bir hata oluştu.',
+                        'An error occurred while loading the 3DS page.',
+                    ),
+                );
                 onClose();
             }
         }
@@ -175,7 +182,11 @@ export function ThreedsModal({
                             window.location.href = event.data.failedUrl;
                         } else {
                             alert(
-                                event.data.message || '3DS doğrulama başarısız',
+                                event.data.message ||
+                                    text(
+                                        '3DS doğrulama başarısız',
+                                        '3DS verification failed',
+                                    ),
                             );
                         }
                     }
@@ -209,10 +220,18 @@ export function ThreedsModal({
                 <DialogHeader>
                     <div className="flex items-center justify-center gap-2">
                         <Lock className="h-5 w-5 text-indigo-600" />
-                        <DialogTitle>3D Secure Doğrulama</DialogTitle>
+                        <DialogTitle>
+                            {text(
+                                '3D Secure Doğrulama',
+                                '3D Secure Verification',
+                            )}
+                        </DialogTitle>
                     </div>
                     <DialogDescription className="text-center">
-                        Lütfen kartınızın 3D Secure doğrulamasını tamamlayın
+                        {text(
+                            'Lütfen kartınızın 3D Secure doğrulamasını tamamlayın',
+                            'Please complete your card’s 3D Secure verification',
+                        )}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -229,15 +248,19 @@ export function ThreedsModal({
                         />
                     ) : (
                         <div className="flex h-[500px] items-center justify-center">
-                            <p className="text-slate-500">Yükleniyor...</p>
+                            <p className="text-slate-500">
+                                {text('Yükleniyor...', 'Loading...')}
+                            </p>
                         </div>
                     )}
                 </div>
 
                 <div className="mt-4 text-center text-sm text-slate-500">
                     <p>
-                        Doğrulama işlemi tamamlandığında otomatik olarak
-                        yönlendirileceksiniz.
+                        {text(
+                            'Doğrulama işlemi tamamlandığında otomatik olarak yönlendirileceksiniz.',
+                            'You will be redirected automatically when verification is completed.',
+                        )}
                     </p>
                 </div>
             </DialogContent>

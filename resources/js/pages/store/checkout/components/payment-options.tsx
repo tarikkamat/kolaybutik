@@ -1,11 +1,18 @@
+import { useI18n } from '@/i18n';
 import { PaymentMethod, PaymentOptionsProps } from '@/types/cart';
 import { AppWindow, CreditCard, Save, Wallet2, Zap } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { CheckoutForm } from './checkout-form';
 import { CreditCardPayment } from './credit-card-payment';
 import { OtherPaymentMethod } from './other-payment-method';
 import { PayWithIyzico } from './pay-with-iyzico';
 import { QuickPwi } from './quick-pwi';
+import { SavedCardPayment } from './saved-card-payment';
+
+interface InstallmentOption {
+    installmentNumber: number;
+    installmentPrice: number;
+    totalPrice: number;
+}
 
 export function PaymentOptions({
     formData,
@@ -21,8 +28,14 @@ export function PaymentOptions({
     selectedInstallment = 1,
     onInstallmentChange,
     isLoadingInstallments = false,
+    savedCards = [],
+    isLoadingSavedCards = false,
+    savedCardsError = null,
+    onFetchSavedCards,
+    onSavedCardSelect,
+    onCardUserKeyChange,
 }: PaymentOptionsProps & {
-    installmentOptions?: any[];
+    installmentOptions?: InstallmentOption[];
     selectedInstallment?: number;
     onInstallmentChange?: (
         installmentNumber: number,
@@ -31,19 +44,10 @@ export function PaymentOptions({
     ) => void;
     isLoadingInstallments?: boolean;
 }) {
-    const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(
-        (formData.payment_method as PaymentMethod) || null,
-    );
-
-    // Sync selectedMethod with formData.payment_method
-    useEffect(() => {
-        if (formData.payment_method) {
-            setSelectedMethod(formData.payment_method as PaymentMethod);
-        }
-    }, [formData.payment_method]);
+    const { text } = useI18n();
+    const selectedMethod = (formData.payment_method as PaymentMethod) || null;
 
     const handleMethodSelect = (method: PaymentMethod) => {
-        setSelectedMethod(method);
         onPaymentMethodChange?.(method);
         onInputChange({
             target: { name: 'payment_method', value: method },
@@ -53,48 +57,60 @@ export function PaymentOptions({
     const paymentMethods = [
         {
             id: 'credit_card' as PaymentMethod,
-            title: 'Kredi Kartı ile Ödeme',
+            title: text('Kredi Kartı ile Ödeme', 'Pay with Credit Card'),
             icon: CreditCard,
-            description: 'Kredi kartı bilgilerinizi girin',
+            description: text(
+                'Kredi kartı bilgilerinizi girin',
+                'Enter your credit card details',
+            ),
             showPayButton: true,
         },
         {
             id: 'checkout_form' as PaymentMethod,
-            title: 'Checkout Form ile Ödeme',
+            title: text('Checkout Form ile Ödeme', 'Pay with Checkout Form'),
             icon: AppWindow,
-            description: 'iyzico Checkout Form kullanarak ödeme yapın',
+            description: text(
+                'iyzico Checkout Form kullanarak ödeme yapın',
+                'Pay using iyzico Checkout Form',
+            ),
             showPayButton: false,
         },
         {
             id: 'iyzico' as PaymentMethod,
             title: 'Pay with iyzico',
             icon: Wallet2,
-            description: 'iyzico ile güvenli ödeme',
+            description: text(
+                'iyzico ile güvenli ödeme',
+                'Secure payment with iyzico',
+            ),
+            showPayButton: true,
+        },
+        {
+            id: 'saved_card' as PaymentMethod,
+            title: text('Saklı Kart ile Ödeme', 'Pay with Saved Card'),
+            icon: Save,
+            description: text(
+                'Mevcut saklı kartlarınızdan birini kullanın',
+                'Use one of your saved cards',
+            ),
             showPayButton: true,
         },
         {
             id: 'iyzico_quick' as PaymentMethod,
             title: 'Quick Pay with iyzico',
             icon: Zap,
-            description: 'Hızlı ödeme ile devam edin',
+            description: text(
+                'Hızlı ödeme ile devam edin',
+                'Continue with quick payment',
+            ),
             showPayButton: false,
         },
     ];
 
-    /** TODO:
-     *         {
-            id: 'saved_card' as PaymentMethod,
-            title: 'Saklı Kart ile Ödeme',
-            icon: Save,
-            description: 'Daha önce kaydettiğiniz kartı kullanın',
-            showPayButton: true,
-        },
-     */
-
     return (
         <div>
             <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">
-                Ödeme Yöntemi Seçin
+                {text('Ödeme Yöntemi Seçin', 'Select a Payment Method')}
             </h2>
 
             <div className="space-y-4">
@@ -160,7 +176,9 @@ export function PaymentOptions({
                                     installmentOptions={installmentOptions}
                                     selectedInstallment={selectedInstallment}
                                     onInstallmentChange={onInstallmentChange}
-                                    isLoadingInstallments={isLoadingInstallments}
+                                    isLoadingInstallments={
+                                        isLoadingInstallments
+                                    }
                                 />
                             )}
 
@@ -184,17 +202,39 @@ export function PaymentOptions({
                                 <QuickPwi formData={formData} />
                             )}
 
-                            {/* Diğer ödeme yöntemleri için placeholder */}
-                            {isSelected && method.id !== 'credit_card' && method.id !== 'checkout_form' && method.id !== 'iyzico' && method.id !== 'iyzico_quick' && (
-                                <OtherPaymentMethod
-                                    title={method.title}
-                                    icon={Icon}
-                                    showPayButton={method.showPayButton}
+                            {/* Saved Card */}
+                            {isSelected && method.id === 'saved_card' && (
+                                <SavedCardPayment
+                                    formData={formData}
+                                    savedCards={savedCards}
+                                    isLoadingSavedCards={isLoadingSavedCards}
+                                    savedCardsError={savedCardsError}
+                                    onFetchSavedCards={onFetchSavedCards}
+                                    onSavedCardSelect={onSavedCardSelect}
+                                    onCardUserKeyChange={onCardUserKeyChange}
+                                    onCardCvvChange={onCardCvvChange}
                                     onSubmit={onSubmit}
                                     isSubmitting={isSubmitting}
                                     isValid={isValid}
                                 />
                             )}
+
+                            {/* Diğer ödeme yöntemleri için placeholder */}
+                            {isSelected &&
+                                method.id !== 'credit_card' &&
+                                method.id !== 'checkout_form' &&
+                                method.id !== 'iyzico' &&
+                                method.id !== 'iyzico_quick' &&
+                                method.id !== 'saved_card' && (
+                                    <OtherPaymentMethod
+                                        title={method.title}
+                                        icon={Icon}
+                                        showPayButton={method.showPayButton}
+                                        onSubmit={onSubmit}
+                                        isSubmitting={isSubmitting}
+                                        isValid={isValid}
+                                    />
+                                )}
                         </div>
                     );
                 })}

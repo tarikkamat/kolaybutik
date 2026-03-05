@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n';
 import { Category } from '@/types/models';
 import { ProductFilters } from './product-filters';
 
@@ -29,11 +30,13 @@ export function CategorySidebar({
     onPriceChange,
     onFilterChange,
 }: CategorySidebarProps) {
+    const { text } = useI18n();
+
     return (
         <aside className="lg:col-span-1">
             <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-800">
                 <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
-                    Kategoriler
+                    {text('Kategoriler', 'Categories')}
                 </h3>
                 <ul className="space-y-1">
                     <li>
@@ -51,7 +54,7 @@ export function CategorySidebar({
                                 </span>
                             )}
                             <span className={!selectedCategoryId ? 'ml-5' : ''}>
-                                Tüm Kategoriler
+                                {text('Tüm Kategoriler', 'All Categories')}
                             </span>
                         </button>
                     </li>

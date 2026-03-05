@@ -8,9 +8,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-    'Noto Color Emoji';
+    --font-sans:
+        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -61,11 +62,11 @@
 }
 
 :root {
-    --iyzico-denim: #1E64FF;
-    --iyzico-bittersweet: #FA7355;
-    --kaamaru: #1E146E;
-    --aqua: #7DE6E1;
-    --yellow: #FFB900;
+    --iyzico-denim: #1e64ff;
+    --iyzico-bittersweet: #fa7355;
+    --kaamaru: #1e146e;
+    --aqua: #7de6e1;
+    --yellow: #ffb900;
     --gray: #212529;
     --heading-color: var(--iyzico-denim);
     --button-bg: var(--kaamaru);
@@ -152,9 +153,31 @@
         @apply border-border;
     }
 
+    html {
+        scrollbar-gutter: stable;
+    }
+
+    @supports not (scrollbar-gutter: stable) {
+        html {
+            overflow-y: scroll;
+        }
+    }
+
     body {
         @apply bg-background text-foreground;
         font-display: swap;
+    }
+
+    body[data-scroll-locked] {
+        overflow: auto !important;
+        margin-right: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .with-scroll-bars-hidden {
+        overflow: auto !important;
+        margin-right: 0 !important;
+        padding-right: 0 !important;
     }
 
     h1,
@@ -172,7 +195,15 @@
 @layer utilities {
     /* Reduce layout shift */
     .font-loading {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-family:
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            'Segoe UI',
+            Roboto,
+            'Helvetica Neue',
+            Arial,
+            sans-serif;
     }
 
     /* Optimize font rendering */
@@ -198,13 +229,22 @@
     }
 
     .chip-error {
-        background-color: color-mix(in srgb, var(--iyzico-bittersweet) 20%, white);
+        background-color: color-mix(
+            in srgb,
+            var(--iyzico-bittersweet) 20%,
+            white
+        );
         color: color-mix(in srgb, var(--kaamaru) 85%, black);
-        border: 1px solid color-mix(in srgb, var(--iyzico-bittersweet) 65%, transparent);
+        border: 1px solid
+            color-mix(in srgb, var(--iyzico-bittersweet) 65%, transparent);
     }
 
     .dark .chip-error {
-        background-color: color-mix(in srgb, var(--iyzico-bittersweet) 20%, black);
+        background-color: color-mix(
+            in srgb,
+            var(--iyzico-bittersweet) 20%,
+            black
+        );
         color: #ffffff;
     }
 }

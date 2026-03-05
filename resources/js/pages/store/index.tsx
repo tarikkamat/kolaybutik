@@ -1,4 +1,5 @@
 import { useAddToCart } from '@/hooks/use-add-to-cart';
+import { useI18n } from '@/i18n';
 import StoreLayout from '@/layouts/store-layout';
 import { PaginatedData } from '@/types';
 import { Category, Product } from '@/types/models';
@@ -30,6 +31,7 @@ export default function StoreIndex({
 }: StoreIndexProps) {
     const [isLoading, setIsLoading] = useState(false);
     const { addingToCart, handleAddToCart } = useAddToCart();
+    const { text } = useI18n();
     const priceChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // URL'den gelen category_id'yi number'a çevir
@@ -119,13 +121,13 @@ export default function StoreIndex({
     }, []);
 
     return (
-        <StoreLayout title="Mağaza">
-            <Head title="Mağaza" />
+        <StoreLayout title={text('Mağaza', 'Store')}>
+            <Head title={text('Mağaza', 'Store')} />
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 {/* Hero Section */}
                 <div className="mb-12 text-center">
                     <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
-                        Mağaza
+                        {text('Mağaza', 'Store')}
                     </h1>
                 </div>
 

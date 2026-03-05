@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n';
 import StoreLayout from '@/layouts/store-layout';
 import { getCsrfToken } from '@/lib/csrf';
 import { CartIndexProps } from '@/types/cart';
@@ -14,6 +15,7 @@ export default function CartIndex({
     shipping = 0,
     total,
 }: CartIndexProps) {
+    const { text } = useI18n();
     const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set());
     const [removingItems, setRemovingItems] = useState<Set<number>>(new Set());
 
@@ -39,13 +41,22 @@ export default function CartIndex({
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || 'Miktar güncelleme başarısız');
+                throw new Error(
+                    data.message ||
+                        text(
+                            'Miktar güncelleme başarısız',
+                            'Failed to update quantity',
+                        ),
+                );
             }
 
             // Sayfayı yeniden yükle
             router.reload();
         } catch (error) {
-            console.error('Miktar güncelleme hatası:', error);
+            console.error(
+                text('Miktar güncelleme hatası:', 'Quantity update error:'),
+                error,
+            );
         } finally {
             setUpdatingItems((prev) => {
                 const newSet = new Set(prev);
@@ -71,13 +82,19 @@ export default function CartIndex({
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || 'Ürün silme başarısız');
+                throw new Error(
+                    data.message ||
+                        text('Ürün silme başarısız', 'Failed to remove item'),
+                );
             }
 
             // Sayfayı yeniden yükle
             router.reload();
         } catch (error) {
-            console.error('Ürün silme hatası:', error);
+            console.error(
+                text('Ürün silme hatası:', 'Remove item error:'),
+                error,
+            );
         } finally {
             setRemovingItems((prev) => {
                 const newSet = new Set(prev);
@@ -89,8 +106,8 @@ export default function CartIndex({
 
     if (items.length === 0) {
         return (
-            <StoreLayout title="Sepetim">
-                <Head title="Sepetim" />
+            <StoreLayout title={text('Sepetim', 'My Cart')}>
+                <Head title={text('Sepetim', 'My Cart')} />
                 <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                     <CartEmptyState />
                 </div>
@@ -99,15 +116,15 @@ export default function CartIndex({
     }
 
     return (
-        <StoreLayout title="Sepetim">
-            <Head title="Sepetim" />
+        <StoreLayout title={text('Sepetim', 'My Cart')}>
+            <Head title={text('Sepetim', 'My Cart')} />
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 <div className="mb-12">
                     <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
-                        Sepetim
+                        {text('Sepetim', 'My Cart')}
                     </h1>
                     <p className="mt-2 text-slate-600 dark:text-slate-400">
-                        {items.length} ürün
+                        {items.length} {text('ürün', 'products')}
                     </p>
                 </div>
 
