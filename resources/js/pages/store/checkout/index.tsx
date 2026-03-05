@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button';
 import { useI18n } from '@/i18n';
 import StoreLayout from '@/layouts/store-layout';
 import { CheckoutIndexProps, SavedCard } from '@/types/cart';
-import { fakerTR as faker } from '@faker-js/faker';
 import { Head, Link, router } from '@inertiajs/react';
 import {
     ArrowLeft,
@@ -15,6 +14,77 @@ import { useState } from 'react';
 import { CheckoutSummary } from './components/checkout-summary';
 import { PaymentOptions } from './components/payment-options';
 import { ShippingAddressForm } from './components/shipping-address-form';
+
+const MALE_FIRST_NAMES = [
+    'Ahmet',
+    'Mehmet',
+    'Mustafa',
+    'Ali',
+    'Burak',
+    'Emre',
+    'Can',
+    'Mert',
+    'Fatih',
+    'Hakan',
+] as const;
+
+const FEMALE_FIRST_NAMES = [
+    'Ayşe',
+    'Fatma',
+    'Elif',
+    'Zeynep',
+    'Merve',
+    'Melis',
+    'Hazal',
+    'Seda',
+    'Derya',
+    'Buse',
+] as const;
+
+const LAST_NAMES = [
+    'Yılmaz',
+    'Kaya',
+    'Demir',
+    'Çelik',
+    'Şahin',
+    'Yıldız',
+    'Aydın',
+    'Öztürk',
+    'Arslan',
+    'Doğan',
+] as const;
+
+const PHONE_NUMBERS = [
+    '05550000001',
+    '05550000002',
+    '05550000003',
+    '05550000004',
+    '05550000005',
+    '05550000006',
+    '05550000007',
+    '05550000008',
+    '05550000009',
+    '05550000010',
+] as const;
+
+const getRandomItem = <T,>(array: readonly T[]): T =>
+    array[Math.floor(Math.random() * array.length)];
+
+const generateEmailFromName = (firstName: string, lastName: string): string => {
+    const normalize = (value: string) =>
+        value
+            .toLowerCase()
+            .replace(/ğ/g, 'g')
+            .replace(/ü/g, 'u')
+            .replace(/ş/g, 's')
+            .replace(/ı/g, 'i')
+            .replace(/ö/g, 'o')
+            .replace(/ç/g, 'c')
+            .replace(/\s+/g, '');
+
+    const localPart = `${normalize(firstName)}.${normalize(lastName)}`;
+    return `${localPart}@example.com`;
+};
 
 const STEPS = [
     { id: 1, icon: MapPin },
@@ -351,14 +421,21 @@ export default function CheckoutIndex({
     };
 
     const handleAutoFillAddress = () => {
+        const isMale = Math.random() < 0.5;
+        const firstName = isMale
+            ? getRandomItem(MALE_FIRST_NAMES)
+            : getRandomItem(FEMALE_FIRST_NAMES);
+        const lastName = getRandomItem(LAST_NAMES);
+        const phone = getRandomItem(PHONE_NUMBERS);
+
         setFormData((prev) => ({
             ...prev,
-            full_name: `${faker.person.firstName()} ${faker.person.lastName()}`,
-            email: faker.internet.email().toLowerCase(),
-            phone: `0${faker.number.int({ min: 5000000000, max: 5999999999 })}`,
-            address: faker.location.streetAddress(),
-            city: faker.location.city(),
-            postal_code: faker.location.zipCode('#####'),
+            full_name: `${firstName} ${lastName}`,
+            email: generateEmailFromName(firstName, lastName),
+            phone,
+            address: 'Örnek Mah. Örnek Sokak No:1 Daire:1',
+            city: 'İstanbul',
+            postal_code: '34000',
             country: 'Türkiye',
         }));
     };
