@@ -156,7 +156,5 @@ export interface PaymentOptionsProps {
     savedCards?: SavedCard[];
     isLoadingSavedCards?: boolean;
     savedCardsError?: string | null;
-    onFetchSavedCards?: () => void;
     onSavedCardSelect?: (cardToken: string) => void;
-    onCardUserKeyChange?: (value: string) => void;
 }

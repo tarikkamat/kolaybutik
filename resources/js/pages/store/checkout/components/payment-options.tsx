@@ -31,9 +31,7 @@ export function PaymentOptions({
     savedCards = [],
     isLoadingSavedCards = false,
     savedCardsError = null,
-    onFetchSavedCards,
     onSavedCardSelect,
-    onCardUserKeyChange,
 }: PaymentOptionsProps & {
     installmentOptions?: InstallmentOption[];
     selectedInstallment?: number;
@@ -209,9 +207,7 @@ export function PaymentOptions({
                                     savedCards={savedCards}
                                     isLoadingSavedCards={isLoadingSavedCards}
                                     savedCardsError={savedCardsError}
-                                    onFetchSavedCards={onFetchSavedCards}
                                     onSavedCardSelect={onSavedCardSelect}
-                                    onCardUserKeyChange={onCardUserKeyChange}
                                     onCardCvvChange={onCardCvvChange}
                                     onSubmit={onSubmit}
                                     isSubmitting={isSubmitting}

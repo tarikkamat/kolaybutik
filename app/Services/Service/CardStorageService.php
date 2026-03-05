@@ -2,26 +2,73 @@
 
 namespace App\Services\Service;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Iyzipay\Model\Card;
 use Iyzipay\Model\CardInformation;
-use Iyzipay\Model\CardList;
 use Iyzipay\Model\Locale;
 use Iyzipay\Options;
 use Iyzipay\Request\CreateCardRequest;
 use Iyzipay\Request\DeleteCardRequest;
-use Iyzipay\Request\RetrieveCardListRequest;
 
 class CardStorageService
 {
     private Options $options;
+    private string $apiKey;
+    private string $secretKey;
+    private string $baseUrl;
 
     public function __construct()
     {
-        $cardStorageConfig = config('iyzipay.card_storage');
+        $cardStorageConfig = config('iyzipay.card_storage', []);
+
+        $this->apiKey = (string) ($cardStorageConfig['api_key'] ?? config('iyzipay.api_key', ''));
+        $this->secretKey = (string) ($cardStorageConfig['secret_key'] ?? config('iyzipay.secret_key', ''));
+        $this->baseUrl = rtrim((string) ($cardStorageConfig['base_url'] ?? config('iyzipay.base_url', '')), '/');
+
         $this->options = new Options();
-        $this->options->setApiKey($cardStorageConfig['api_key']);
-        $this->options->setSecretKey($cardStorageConfig['secret_key']);
-        $this->options->setBaseUrl($cardStorageConfig['base_url']);
+        $this->options->setApiKey($this->apiKey);
+        $this->options->setSecretKey($this->secretKey);
+        $this->options->setBaseUrl($this->baseUrl);
+    }
+
+    private function getCacheStore()
+    {
+        try {
+            return Cache::store('redis');
+        } catch (\Throwable $e) {
+            return Cache::store();
+        }
+    }
+
+    private function cardsCacheKey(string $cardUserKey): string
+    {
+        return 'iyzipay:card-storage:cards:'.$cardUserKey;
+    }
+
+    private function forgetCardsCache(?string $cardUserKey): void
+    {
+        if (!$cardUserKey) {
+            return;
+        }
+
+        $this->getCacheStore()->forget($this->cardsCacheKey($cardUserKey));
+    }
+
+    private function buildIyzwsV2Authorization(string $uri, string $jsonPayload, string $randomKey): string
+    {
+        $payload = $uri.$jsonPayload;
+        $signature = hash_hmac('sha256', $randomKey.$payload, $this->secretKey, true);
+        $signatureHex = bin2hex($signature);
+
+        $hashString = sprintf(
+            'apiKey:%s&randomKey:%s&signature:%s',
+            $this->apiKey,
+            $randomKey,
+            $signatureHex
+        );
+
+        return 'IYZWSv2 '.base64_encode($hashString);
     }
 
     /**
@@ -64,6 +111,8 @@ class CardStorageService
             $card = Card::create($request, $this->options);
 
             if ($card->getStatus() === 'success') {
+                $this->forgetCardsCache($card->getCardUserKey());
+
                 return [
                     'status' => $card->getStatus(),
                     'locale' => $card->getLocale(),
@@ -116,6 +165,8 @@ class CardStorageService
             $card = Card::delete($request, $this->options);
 
             if ($card->getStatus() === 'success') {
+                $this->forgetCardsCache($cardUserKey);
+
                 return [
                     'status' => $card->getStatus(),
                     'locale' => $card->getLocale(),
@@ -141,56 +192,128 @@ class CardStorageService
      * Retrieve Cards
      *
      * @param  string  $cardUserKey
+     * @param  bool  $forceRefresh
      * @return array|null
      */
-    public function retrieveCards(string $cardUserKey): ?array
+    public function retrieveCards(string $cardUserKey, bool $forceRefresh = false): ?array
+    {
+        if (empty($cardUserKey)) {
+            return [
+                'status' => 'error',
+                'errorMessage' => 'cardUserKey gerekli',
+                'errorCode' => 'MISSING_CARD_USER_KEY',
+            ];
+        }
+
+        $cacheStore = $this->getCacheStore();
+        $cacheKey = $this->cardsCacheKey($cardUserKey);
+
+        if (!$forceRefresh) {
+            $cached = $cacheStore->get($cacheKey);
+            if (is_array($cached)) {
+                return $cached;
+            }
+        }
+
+        $result = $this->retrieveCardsDirect($cardUserKey);
+
+        if ($result && ($result['status'] ?? '') === 'success') {
+            $cacheStore->forever($cacheKey, $result);
+        }
+
+        return $result;
+    }
+
+    private function retrieveCardsDirect(string $cardUserKey): ?array
     {
         try {
-            $request = new RetrieveCardListRequest();
-            $request->setLocale(Locale::TR);
-            $request->setConversationId(uniqid('conv_', true));
-            $request->setCardUserKey($cardUserKey);
-
-            $cardList = CardList::retrieve($request, $this->options);
-
-            if ($cardList->getStatus() === 'success') {
-                $cards = [];
-
-                if ($cardList->getCardDetails()) {
-                    foreach ($cardList->getCardDetails() as $card) {
-                        $cards[] = [
-                            'cardToken' => $card->getCardToken(),
-                            'cardAlias' => $card->getCardAlias(),
-                            'binNumber' => $card->getBinNumber(),
-                            'lastFourDigits' => $card->getLastFourDigits(),
-                            'cardType' => $card->getCardType(),
-                            'cardAssociation' => $card->getCardAssociation(),
-                            'cardFamily' => $card->getCardFamily(),
-                            'cardBankCode' => $card->getCardBankCode(),
-                            'cardBankName' => $card->getCardBankName(),
-                        ];
-                    }
-                }
-
+            if (empty($this->apiKey) || empty($this->secretKey) || empty($this->baseUrl)) {
                 return [
-                    'status' => $cardList->getStatus(),
-                    'locale' => $cardList->getLocale(),
-                    'systemTime' => $cardList->getSystemTime(),
-                    'conversationId' => $cardList->getConversationId(),
-                    'cardUserKey' => $cardList->getCardUserKey(),
-                    'cards' => $cards,
+                    'status' => 'error',
+                    'errorMessage' => 'Card storage credentials eksik',
+                    'errorCode' => 'MISSING_CARD_STORAGE_CREDENTIALS',
                 ];
             }
 
-            return [
-                'status' => $cardList->getStatus(),
-                'errorMessage' => $cardList->getErrorMessage(),
-                'errorCode' => $cardList->getErrorCode(),
+            $uri = '/cardstorage/cards';
+            $conversationId = uniqid('conv_', true);
+            $payload = [
+                'locale' => 'tr',
+                'conversationId' => $conversationId,
+                'cardUserKey' => $cardUserKey,
             ];
-        } catch (\Exception $e) {
+
+            $jsonPayload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if ($jsonPayload === false) {
+                return [
+                    'status' => 'error',
+                    'errorMessage' => 'Kart listesi isteği hazırlanamadı',
+                    'errorCode' => 'JSON_ENCODE_FAILED',
+                ];
+            }
+
+            $randomKey = (string) random_int(100000000000000, 999999999999999);
+            $authorization = $this->buildIyzwsV2Authorization($uri, $jsonPayload, $randomKey);
+
+            $response = Http::withHeaders([
+                'Authorization' => $authorization,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->timeout(20)->send('POST', $this->baseUrl.$uri, [
+                'body' => $jsonPayload,
+            ]);
+
+            $responseData = $response->json();
+            if (!is_array($responseData)) {
+                return [
+                    'status' => 'error',
+                    'errorMessage' => 'Kart listesi yanıtı parse edilemedi',
+                    'errorCode' => 'INVALID_RESPONSE',
+                ];
+            }
+
+            if (($responseData['status'] ?? '') !== 'success') {
+                return [
+                    'status' => $responseData['status'] ?? 'error',
+                    'errorMessage' => $responseData['errorMessage'] ?? 'Kartlar getirilemedi',
+                    'errorCode' => $responseData['errorCode'] ?? 'CARD_RETRIEVE_FAILED',
+                ];
+            }
+
+            $rawCardDetails = is_array($responseData['cardDetails'] ?? null)
+                ? $responseData['cardDetails']
+                : [];
+
+            $cards = array_map(static function ($card): array {
+                return [
+                    'cardToken' => $card['cardToken'] ?? '',
+                    'cardAlias' => $card['cardAlias'] ?? null,
+                    'binNumber' => $card['binNumber'] ?? null,
+                    'lastFourDigits' => $card['lastFourDigits'] ?? null,
+                    'cardType' => $card['cardType'] ?? null,
+                    'cardAssociation' => $card['cardAssociation'] ?? null,
+                    'cardFamily' => $card['cardFamily'] ?? null,
+                    'cardBankCode' => $card['cardBankCode'] ?? null,
+                    'cardBankName' => $card['cardBankName'] ?? null,
+                    'expireMonth' => $card['expireMonth'] ?? null,
+                    'expireYear' => $card['expireYear'] ?? null,
+                ];
+            }, $rawCardDetails);
+
+            return [
+                'status' => $responseData['status'],
+                'locale' => $responseData['locale'] ?? 'tr',
+                'systemTime' => $responseData['systemTime'] ?? null,
+                'conversationId' => $responseData['conversationId'] ?? $conversationId,
+                'cardUserKey' => $responseData['cardUserKey'] ?? $cardUserKey,
+                'cards' => $cards,
+                'cardDetails' => $cards,
+            ];
+        } catch (\Throwable $e) {
             return [
                 'status' => 'error',
-                'errorMessage' => $e->getMessage(),
+                'errorMessage' => 'Kart listesi alınamadı: '.$e->getMessage(),
+                'errorCode' => 'CARD_RETRIEVE_EXCEPTION',
             ];
         }
     }

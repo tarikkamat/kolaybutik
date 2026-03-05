@@ -96,7 +96,7 @@ export default function CheckoutIndex({
                 );
             }
             if (formData.payment_method === 'saved_card') {
-                return !!(formData.card_user_key && formData.card_token);
+                return !!formData.card_token;
             }
             // For other payment methods, just having a method selected is enough
             return true;
@@ -288,18 +288,12 @@ export default function CheckoutIndex({
         setFormData((prev) => ({ ...prev, card_cvv: cleaned }));
     };
 
-    const fetchSavedCards = async (cardUserKey?: string) => {
+    const fetchSavedCards = async () => {
         setIsLoadingSavedCards(true);
         setSavedCardsError(null);
 
         try {
-            const resolvedCardUserKey =
-                cardUserKey ?? formData.card_user_key ?? '';
-            const query = resolvedCardUserKey
-                ? `?cardUserKey=${encodeURIComponent(resolvedCardUserKey)}`
-                : '';
-
-            const response = await fetch(`/store/payment/saved-cards${query}`, {
+            const response = await fetch('/store/payment/saved-cards', {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',
@@ -308,8 +302,7 @@ export default function CheckoutIndex({
 
             const result = await response.json();
             const cards = Array.isArray(result.cards) ? result.cards : [];
-            const fetchedCardUserKey =
-                result.cardUserKey || resolvedCardUserKey || '';
+            const fetchedCardUserKey = result.cardUserKey || '';
 
             setSavedCards(cards);
             setFormData((prev) => ({
@@ -348,16 +341,6 @@ export default function CheckoutIndex({
         if (method === 'saved_card') {
             void fetchSavedCards();
         }
-    };
-
-    const handleCardUserKeyChange = (value: string) => {
-        setSavedCardsError(null);
-        setSavedCards([]);
-        setFormData((prev) => ({
-            ...prev,
-            card_user_key: value,
-            card_token: '',
-        }));
     };
 
     const handleSavedCardSelect = (cardToken: string) => {
@@ -535,14 +518,8 @@ export default function CheckoutIndex({
                                             isLoadingSavedCards
                                         }
                                         savedCardsError={savedCardsError}
-                                        onFetchSavedCards={() =>
-                                            void fetchSavedCards()
-                                        }
                                         onSavedCardSelect={
                                             handleSavedCardSelect
-                                        }
-                                        onCardUserKeyChange={
-                                            handleCardUserKeyChange
                                         }
                                     />
                                 )}
