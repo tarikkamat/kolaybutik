@@ -21,6 +21,7 @@ abstract class BasePaymentRequest extends FormRequest
             'city' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
+            'locale' => 'nullable|string|in:tr,en,tr-TR,en-US',
         ];
     }
 
@@ -32,4 +33,3 @@ abstract class BasePaymentRequest extends FormRequest
         return true;
     }
 }
-

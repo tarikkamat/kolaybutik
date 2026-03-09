@@ -196,6 +196,7 @@ class QuickDemoController extends Controller
             'full_name' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
+            'locale' => 'nullable|string|in:tr,en,tr-TR,en-US',
         ]);
 
         // Demo buyer ve adres bilgilerini ekle
@@ -239,6 +240,7 @@ class QuickDemoController extends Controller
             'full_name' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
+            'locale' => 'nullable|string|in:tr,en,tr-TR,en-US',
         ]);
 
         // Demo buyer ve adres bilgilerini ekle

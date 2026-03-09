@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useI18n } from '@/i18n';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Head, Link, router } from '@inertiajs/react';
 import { AppWindow, ArrowLeft, CreditCard, Wallet2 } from 'lucide-react';
@@ -31,6 +32,8 @@ export default function QuickDemo({
     total,
     paymentMethod,
 }: QuickDemoProps) {
+    const { language } = useI18n();
+
     // Tab mapping
     const tabMapping: Record<string, string> = {
         'credit-card': 'credit-card',
@@ -173,6 +176,7 @@ export default function QuickDemo({
                     ...formData,
                     payment_method: 'credit_card',
                     installment: selectedInstallment,
+                    locale: language,
                 }),
             });
 

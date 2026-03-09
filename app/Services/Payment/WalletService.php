@@ -4,6 +4,7 @@ namespace App\Services\Payment;
 
 use App\Services\Checkout\CartService;
 use App\Services\Payment\Helpers\SignatureVerification;
+use App\Services\Payment\Support\LocaleResolver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
@@ -44,6 +45,7 @@ class WalletService
     {
         try {
             $sessionId = Session::getId();
+            $locale = LocaleResolver::resolve($data['locale'] ?? null);
 
             // Demo mod için cart summary kontrolü
             $cartSummary = $data['demo_cart_summary'] ?? $this->cartService->getCartSummary();
@@ -61,7 +63,7 @@ class WalletService
 
             // Request oluştur
             $request = new CreatePayWithIyzicoInitializeRequest();
-            $request->setLocale(Locale::TR);
+            $request->setLocale($locale);
             $request->setConversationId(uniqid('conv_', true));
             $request->setPrice(number_format($subtotal, 2, '.', ''));
             $request->setPaidPrice(number_format($total, 2, '.', ''));
@@ -131,6 +133,7 @@ class WalletService
                 // Session'a bilgileri kaydet
                 Session::put('pay_with_iyzico_token', $payWithIyzicoInitialize->getToken());
                 Session::put('pay_with_iyzico_conversation_id', $payWithIyzicoInitialize->getConversationId());
+                Session::put('pay_with_iyzico_locale', $locale);
 
                 return [
                     'status' => 'success',
@@ -173,6 +176,7 @@ class WalletService
     public function processWalletPayment(array $data): ?array
     {
         try {
+            $locale = LocaleResolver::resolve($data['locale'] ?? Session::get('pay_with_iyzico_locale'));
             $token = $data['token'] ?? Session::get('pay_with_iyzico_token');
 
             if (!$token) {
@@ -187,7 +191,7 @@ class WalletService
 
             // Retrieve Pay with iyzico result
             $request = new RetrievePayWithIyzicoRequest();
-            $request->setLocale(Locale::TR);
+            $request->setLocale($locale);
             $request->setConversationId($conversationId);
             $request->setToken($token);
 
@@ -234,7 +238,7 @@ class WalletService
 
                 if ($paymentStatus === 'SUCCESS') {
                     // Session'dan bilgileri temizle
-                    Session::forget(['pay_with_iyzico_token', 'pay_with_iyzico_conversation_id']);
+                    Session::forget(['pay_with_iyzico_token', 'pay_with_iyzico_conversation_id', 'pay_with_iyzico_locale']);
 
                     return [
                         'status' => 'success',

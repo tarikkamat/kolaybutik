@@ -105,7 +105,7 @@ export default function CheckoutIndex({
     shipping = 0,
     total,
 }: CheckoutIndexProps) {
-    const { text } = useI18n();
+    const { text, language } = useI18n();
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [installmentOptions, setInstallmentOptions] = useState<
@@ -232,7 +232,10 @@ export default function CheckoutIndex({
                             ?.getAttribute('content') || '',
                     Accept: 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    locale: language,
+                }),
             });
 
             const result = await response.json();

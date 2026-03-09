@@ -3,7 +3,9 @@
 namespace App\Services\Payment;
 
 use App\Services\Checkout\CartService;
+use App\Services\Payment\Support\LocaleResolver;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Iyzipay\Model\Address;
 use Iyzipay\Model\BasketItem;
 use Iyzipay\Model\BasketItemType;
@@ -74,6 +76,7 @@ class ApiService
     public function processCreditCardPayment(array $data): ?array
     {
         try {
+            $locale = LocaleResolver::resolve($data['locale'] ?? null);
             $isSavedCardPayment = !empty($data['card_token']) && !empty($data['card_user_key']);
             $options = $this->getOptions($isSavedCardPayment ? 'card_storage' : 'default');
 
@@ -92,7 +95,7 @@ class ApiService
             $total = $cartSummary['total'];
 
             $request = new CreatePaymentRequest();
-            $request->setLocale(Locale::TR);
+            $request->setLocale($locale);
             $request->setConversationId(uniqid('conv_', true));
             $request->setPrice(number_format($subtotal, 2, '.', ''));
             $request->setPaidPrice(number_format($total, 2, '.', ''));
@@ -233,6 +236,9 @@ class ApiService
     public function initializeThreedsPayment(array $data): ?array
     {
         try {
+            $locale = LocaleResolver::resolve($data['locale'] ?? null);
+            Session::put('payment_locale', $locale);
+
             // Demo mod için cart summary kontrolü
             $cartSummary = $data['demo_cart_summary'] ?? $this->cartService->getCartSummary();
 
@@ -248,7 +254,7 @@ class ApiService
             $total = $cartSummary['total'];
 
             $request = new CreatePaymentRequest();
-            $request->setLocale(Locale::TR);
+            $request->setLocale($locale);
             $request->setConversationId(uniqid('conv_', true));
             $request->setPrice(number_format($subtotal, 2, '.', ''));
             $request->setPaidPrice(number_format($total, 2, '.', ''));
@@ -360,8 +366,9 @@ class ApiService
     protected function checkPaymentStatus(string $paymentId, string $conversationId): ?array
     {
         try {
+            $locale = Session::get('payment_locale', Locale::TR);
             $request = new RetrievePaymentRequest();
-            $request->setLocale(Locale::TR);
+            $request->setLocale($locale);
             $request->setConversationId($conversationId);
             $request->setPaymentId($paymentId);
 
@@ -402,6 +409,7 @@ class ApiService
     public function processThreedsPostAuth(array $data): ?array
     {
         try {
+            $locale = LocaleResolver::resolve($data['locale'] ?? Session::get('payment_locale'));
             $cartSummary = $this->cartService->getCartSummary();
             $paymentStatus = $this->checkPaymentStatus($data['paymentId'], $data['conversationId']);
 
@@ -421,7 +429,7 @@ class ApiService
             }
 
             $request = new CreateThreedsPaymentRequest();
-            $request->setLocale(Locale::TR);
+            $request->setLocale($locale);
             $request->setConversationId($data['conversationId'] ?? uniqid('conv_', true));
             $request->setPaymentId($data['paymentId']);
 

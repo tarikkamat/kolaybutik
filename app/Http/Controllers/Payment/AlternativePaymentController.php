@@ -123,6 +123,7 @@ class AlternativePaymentController extends Controller
         $data = [
             'token' => $token,
             'conversationId' => $request->input('conversationId') ?? session()->get('quick_pwi_conversation_id'),
+            'locale' => $request->input('locale') ?? session()->get('quick_pwi_locale'),
         ];
 
         $result = $this->paymentService->processPayment('quick_pwi', $data);
@@ -154,6 +155,7 @@ class AlternativePaymentController extends Controller
         $data = [
             'token' => $token,
             'conversationId' => $request->input('conversationId') ?? session()->get('checkout_form_conversation_id'),
+            'locale' => $request->input('locale') ?? session()->get('checkout_form_locale'),
         ];
 
         $result = $this->paymentService->processCheckoutFormPayment($data);
@@ -185,6 +187,7 @@ class AlternativePaymentController extends Controller
         $data = [
             'token' => $token,
             'conversationId' => $request->input('conversationId') ?? session()->get('pay_with_iyzico_conversation_id'),
+            'locale' => $request->input('locale') ?? session()->get('pay_with_iyzico_locale'),
         ];
 
         $result = $this->paymentService->processPayment('wallet', $data);
@@ -192,4 +195,3 @@ class AlternativePaymentController extends Controller
         return $this->handlePaymentResult($request, $result);
     }
 }
-

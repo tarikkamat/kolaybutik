@@ -4,6 +4,7 @@ namespace App\Services\Payment;
 
 use App\Services\Checkout\CartService;
 use App\Services\Payment\Helpers\SignatureVerification;
+use App\Services\Payment\Support\LocaleResolver;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Iyzipay\Model\Address;
@@ -45,6 +46,7 @@ class QuickPwiService
     {
         try {
             $sessionId = Session::getId();
+            $locale = LocaleResolver::resolve($data['locale'] ?? null);
 
             $cartSummary = $this->cartService->getCartSummary();
 
@@ -57,7 +59,7 @@ class QuickPwiService
             }
 
             $request = new CreateCheckoutFormInitializeRequest();
-            $request->setLocale(Locale::TR);
+            $request->setLocale($locale);
             $request->setConversationId(uniqid('conv_', true));
             $request->setPrice(number_format($cartSummary['subtotal'], 2, '.', ''));
             $request->setPaidPrice(number_format($cartSummary['total'], 2, '.', ''));
@@ -143,6 +145,7 @@ class QuickPwiService
                 Session::put('quick_pwi_token', $checkoutFormInitialize->getToken());
                 Session::put('quick_pwi_conversation_id', $checkoutFormInitialize->getConversationId());
                 Session::put('quick_pwi_initial_price', $cartSummary['total']);
+                Session::put('quick_pwi_locale', $locale);
 
                 return [
                     'status' => 'success',
@@ -185,6 +188,7 @@ class QuickPwiService
     public function processQuickPayment(array $data): ?array
     {
         try {
+            $locale = LocaleResolver::resolve($data['locale'] ?? Session::get('quick_pwi_locale'));
             $token = $data['token'] ?? Session::get('quick_pwi_token');
 
             if (!$token) {
@@ -199,7 +203,7 @@ class QuickPwiService
 
             // Retrieve checkout form result
             $request = new RetrieveCheckoutFormRequest();
-            $request->setLocale(Locale::TR);
+            $request->setLocale($locale);
             $request->setConversationId($conversationId);
             $request->setToken($token);
 
@@ -247,7 +251,7 @@ class QuickPwiService
 
                 if ($paymentStatus === 'SUCCESS') {
                     // Session'dan bilgileri temizle
-                    Session::forget(['quick_pwi_token', 'quick_pwi_conversation_id', 'quick_pwi_initial_price']);
+                    Session::forget(['quick_pwi_token', 'quick_pwi_conversation_id', 'quick_pwi_initial_price', 'quick_pwi_locale']);
 
                     return [
                         'status' => 'success',

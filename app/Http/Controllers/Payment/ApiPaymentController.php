@@ -249,6 +249,7 @@ class ApiPaymentController extends Controller
             'paymentId' => $paymentId,
             'conversationId' => $conversationId,
             'conversationData' => $conversationData,
+            'locale' => $request->input('locale') ?? session('payment_locale'),
         ];
 
         Log::info('3DS Callback: Starting Post Auth', [

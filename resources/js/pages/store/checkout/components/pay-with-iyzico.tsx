@@ -33,7 +33,7 @@ export function PayWithIyzico({
     isValid = false,
     initializeEndpoint = '/store/payment/iyzico/initialize',
 }: PayWithIyzicoProps) {
-    const { text } = useI18n();
+    const { text, language } = useI18n();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -68,6 +68,7 @@ export function PayWithIyzico({
                     city: formData.city,
                     postal_code: formData.postal_code,
                     country: formData.country || 'Türkiye',
+                    locale: language,
                 }),
             });
 

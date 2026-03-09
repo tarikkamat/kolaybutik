@@ -20,7 +20,7 @@ export function CheckoutForm({
     formData,
     initializeEndpoint = '/store/payment/checkout-form/initialize',
 }: CheckoutFormProps) {
-    const { text } = useI18n();
+    const { text, language } = useI18n();
     const [checkoutFormLoading, setCheckoutFormLoading] = useState(false);
     const [checkoutFormContent, setCheckoutFormContent] = useState<
         string | null
@@ -34,6 +34,14 @@ export function CheckoutForm({
     const requestInProgressRef = useRef(false);
     const abortControllerRef = useRef<AbortController | null>(null);
     const requestedKeysRef = useRef<Set<string>>(new Set());
+
+    useEffect(() => {
+        setCheckoutFormContent(null);
+        setCheckoutFormError(null);
+        setCheckoutFormToken(null);
+        requestedKeysRef.current.clear();
+        requestInProgressRef.current = false;
+    }, [language]);
 
     // Checkout form initialize - iletişim bilgileri doldurulduğunda
     useEffect(() => {
@@ -49,7 +57,7 @@ export function CheckoutForm({
             formData.phone?.trim();
 
         // FormData'ya göre unique key oluştur
-        const requestKey = `${formData.full_name?.trim()}_${formData.email?.trim()}_${formData.phone?.trim()}`;
+        const requestKey = `${language}_${formData.full_name?.trim()}_${formData.email?.trim()}_${formData.phone?.trim()}`;
 
         if (
             !checkoutFormContent &&
@@ -100,6 +108,7 @@ export function CheckoutForm({
                     city: formData.city,
                     postal_code: formData.postal_code,
                     country: formData.country || 'Türkiye',
+                    locale: language,
                 }),
                 signal: abortController.signal,
             })
@@ -186,6 +195,7 @@ export function CheckoutForm({
         formData.email,
         formData.phone,
         initializeEndpoint,
+        language,
     ]);
 
     // Checkout form content yüklendiğinde script'i dinamik olarak ekle
