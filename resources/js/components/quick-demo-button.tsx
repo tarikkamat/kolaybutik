@@ -68,7 +68,7 @@ export function QuickDemoButton({
                     animation: shimmer 3s linear infinite;
                 }
             `}</style>
-            <Link href={href}>
+            <Link href={href} className="block w-full">
                 <Button
                     className={`w-full ${classes.button} relative overflow-hidden transition-all duration-300 hover:shadow-lg`}
                     variant="outline"
