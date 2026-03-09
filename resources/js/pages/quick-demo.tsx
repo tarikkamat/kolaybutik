@@ -32,7 +32,8 @@ export default function QuickDemo({
     total,
     paymentMethod,
 }: QuickDemoProps) {
-    const { language } = useI18n();
+    const { language, text } = useI18n();
+    const displayProductName = text(product.name, 'Hazelnut (100g)');
 
     // Tab mapping
     const tabMapping: Record<string, string> = {
@@ -155,7 +156,12 @@ export default function QuickDemo({
             !formData.card_expiry ||
             !formData.card_cvv
         ) {
-            alert('Lütfen tüm kart bilgilerini doldurun');
+            alert(
+                text(
+                    'Lütfen tüm kart bilgilerini doldurun',
+                    'Please fill in all card details',
+                ),
+            );
             return;
         }
 
@@ -193,13 +199,13 @@ export default function QuickDemo({
                         }
                     } else {
                         router.visit(
-                            `/demo/orders/failed?errorMessage=${encodeURIComponent(result.message || 'Ödeme işlemi başarısız')}`,
+                            `/demo/orders/failed?errorMessage=${encodeURIComponent(result.message || text('Ödeme işlemi başarısız', 'Payment transaction failed'))}`,
                         );
                         setIsSubmitting(false);
                     }
                 } catch (error) {
                     router.visit(
-                        `/demo/orders/failed?errorMessage=${encodeURIComponent('Ödeme işlemi sırasında bir hata oluştu')}`,
+                        `/demo/orders/failed?errorMessage=${encodeURIComponent(text('Ödeme işlemi sırasında bir hata oluştu', 'An error occurred during payment processing'))}`,
                     );
                     setIsSubmitting(false);
                 }
@@ -222,9 +228,9 @@ export default function QuickDemo({
         );
     };
 
-    return (
+        return (
         <>
-            <Head title="Hızlı Deneme" />
+            <Head title={text('Hızlı Deneme', 'Quick Demo')} />
             <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
                 <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                     <div className="mb-6">
@@ -233,13 +239,16 @@ export default function QuickDemo({
                             className="mb-4 inline-flex items-center text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                         >
                             <ArrowLeft className="mr-2 h-4 w-4" />
-                            Geri Dön
+                            {text('Geri Dön', 'Back')}
                         </Link>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                            Hızlı Deneme
+                            {text('Hızlı Deneme', 'Quick Demo')}
                         </h1>
                         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                            Ödeme entegrasyonunu test edin
+                            {text(
+                                'Ödeme entegrasyonunu test edin',
+                                'Test the payment integration',
+                            )}
                         </p>
                     </div>
 
@@ -248,7 +257,7 @@ export default function QuickDemo({
                         <div className="lg:col-span-2">
                             <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-800">
                                 <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">
-                                    Ödeme Yöntemi
+                                    {text('Ödeme Yöntemi', 'Payment Method')}
                                 </h2>
 
                                 <Tabs
@@ -259,11 +268,11 @@ export default function QuickDemo({
                                     <TabsList className="grid w-full grid-cols-3">
                                         <TabsTrigger value="credit-card">
                                             <CreditCard className="mr-2 h-4 w-4" />
-                                            Kredi Kartı
+                                            {text('Kredi Kartı', 'Credit Card')}
                                         </TabsTrigger>
                                         <TabsTrigger value="checkout-form">
                                             <AppWindow className="mr-2 h-4 w-4" />
-                                            Checkout Form
+                                            {text('Checkout Form', 'Checkout Form')}
                                         </TabsTrigger>
                                         <TabsTrigger value="pay-with-iyzico">
                                             <Wallet2 className="mr-2 h-4 w-4" />
@@ -291,21 +300,30 @@ export default function QuickDemo({
                                                         className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                                                     />
                                                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                                        3D Secure ile Ödeme
+                                                        {text(
+                                                            '3D Secure ile Ödeme',
+                                                            'Pay with 3D Secure',
+                                                        )}
                                                     </span>
                                                 </label>
 
                                                 {/* Taksit Seçenekleri */}
                                                 {isLoadingInstallments && (
                                                     <div className="text-sm text-slate-600 dark:text-slate-400">
-                                                        Taksit seçenekleri yükleniyor...
+                                                        {text(
+                                                            'Taksit seçenekleri yükleniyor...',
+                                                            'Loading installment options...',
+                                                        )}
                                                     </div>
                                                 )}
                                                 {!isLoadingInstallments &&
                                                     installmentOptions.length > 0 && (
                                                         <div>
                                                             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                                                                Taksit Seçenekleri
+                                                                {text(
+                                                                    'Taksit Seçenekleri',
+                                                                    'Installment Options',
+                                                                )}
                                                             </label>
                                                             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                                                                 {installmentOptions.map(
@@ -371,8 +389,14 @@ export default function QuickDemo({
                                                 >
                                                     <CreditCard className="mr-2 h-4 w-4" />
                                                     {isSubmitting
-                                                        ? 'İşleniyor...'
-                                                        : 'Ödeme Yap'}
+                                                        ? text(
+                                                              'İşleniyor...',
+                                                              'Processing...',
+                                                          )
+                                                        : text(
+                                                              'Ödeme Yap',
+                                                              'Pay',
+                                                          )}
                                                 </Button>
                                             </div>
                                         </div>
@@ -405,23 +429,24 @@ export default function QuickDemo({
                         <div className="lg:col-span-1">
                             <div className="sticky top-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-800">
                                 <h2 className="mb-4 text-xl font-semibold text-slate-900 dark:text-white">
-                                    Sipariş Özeti
+                                    {text('Sipariş Özeti', 'Order Summary')}
                                 </h2>
 
                                 <div className="mb-4 flex items-center gap-3">
                                     {product.image && (
                                         <img
                                             src={product.image}
-                                            alt={product.name}
+                                            alt={displayProductName}
                                             className="h-16 w-16 rounded object-cover"
                                         />
                                     )}
                                     <div className="flex-1">
                                         <p className="font-medium text-slate-900 dark:text-white">
-                                            {product.name}
+                                            {displayProductName}
                                         </p>
                                         <p className="text-sm text-slate-600 dark:text-slate-400">
-                                            {product.quantity} adet
+                                            {product.quantity}{' '}
+                                            {text('adet', 'pcs')}
                                         </p>
                                     </div>
                                     <span className="font-medium text-slate-900 dark:text-white">
@@ -432,7 +457,7 @@ export default function QuickDemo({
                                 <div className="space-y-3 border-t border-slate-200 pt-4 dark:border-slate-700">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-slate-600 dark:text-slate-400">
-                                            Ara Toplam
+                                            {text('Ara Toplam', 'Subtotal')}
                                         </span>
                                         <span className="font-medium text-slate-900 dark:text-white">
                                             ₺{subtotal.toFixed(2)}
@@ -441,7 +466,7 @@ export default function QuickDemo({
                                     {tax > 0 && (
                                         <div className="flex justify-between text-sm">
                                             <span className="text-slate-600 dark:text-slate-400">
-                                                KDV
+                                                {text('KDV', 'VAT')}
                                             </span>
                                             <span className="font-medium text-slate-900 dark:text-white">
                                                 ₺{tax.toFixed(2)}
@@ -451,7 +476,7 @@ export default function QuickDemo({
                                     {shipping > 0 && (
                                         <div className="flex justify-between text-sm">
                                             <span className="text-slate-600 dark:text-slate-400">
-                                                Kargo
+                                                {text('Kargo', 'Shipping')}
                                             </span>
                                             <span className="font-medium text-slate-900 dark:text-white">
                                                 ₺{shipping.toFixed(2)}
@@ -461,7 +486,7 @@ export default function QuickDemo({
                                     <div className="border-t border-slate-200 pt-3 dark:border-slate-700">
                                         <div className="flex justify-between">
                                             <span className="text-lg font-semibold text-slate-900 dark:text-white">
-                                                Toplam
+                                                {text('Toplam', 'Total')}
                                             </span>
                                             <span className="text-lg font-bold text-indigo-600">
                                                 ₺{total.toFixed(2)}
