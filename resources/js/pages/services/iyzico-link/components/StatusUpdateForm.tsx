@@ -17,6 +17,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Edit } from 'lucide-react';
+import { useI18n } from '@/i18n';
 import { useState } from 'react';
 
 interface StatusUpdateFormProps {
@@ -28,6 +29,7 @@ export default function StatusUpdateForm({
     loading,
     onSubmit,
 }: StatusUpdateFormProps) {
+    const { text } = useI18n();
     const [token, setToken] = useState('');
     const [status, setStatus] = useState<'ACTIVE' | 'PASSIVE'>('ACTIVE');
 
@@ -38,23 +40,30 @@ export default function StatusUpdateForm({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Link Durum Güncelle</CardTitle>
+                <CardTitle>
+                    {text('Link Durum Güncelle', 'Update Link Status')}
+                </CardTitle>
                 <CardDescription>
-                    Link durumunu aktif/pasif yapın
+                    {text(
+                        'Link durumunu aktif/pasif yapın',
+                        'Set link status to active or passive',
+                    )}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div>
-                    <Label htmlFor="status-token">Token *</Label>
+                    <Label htmlFor="status-token">
+                        {text('Token *', 'Token *')}
+                    </Label>
                     <Input
                         id="status-token"
                         value={token}
                         onChange={(e) => setToken(e.target.value)}
-                        placeholder="Link token'ı"
+                        placeholder={text("Link token'ı", 'Link token')}
                     />
                 </div>
                 <div>
-                    <Label htmlFor="status">Durum *</Label>
+                    <Label htmlFor="status">{text('Durum *', 'Status *')}</Label>
                     <Select
                         value={status}
                         onValueChange={(value: 'ACTIVE' | 'PASSIVE') =>
@@ -65,8 +74,12 @@ export default function StatusUpdateForm({
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="ACTIVE">Aktif</SelectItem>
-                            <SelectItem value="PASSIVE">Pasif</SelectItem>
+                            <SelectItem value="ACTIVE">
+                                {text('Aktif', 'Active')}
+                            </SelectItem>
+                            <SelectItem value="PASSIVE">
+                                {text('Pasif', 'Passive')}
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -80,10 +93,9 @@ export default function StatusUpdateForm({
                     ) : (
                         <Edit className="mr-2 h-4 w-4" />
                     )}
-                    Durum Güncelle
+                    {text('Durum Güncelle', 'Update Status')}
                 </Button>
             </CardContent>
         </Card>
     );
 }
-

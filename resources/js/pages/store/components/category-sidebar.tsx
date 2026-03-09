@@ -32,6 +32,17 @@ export function CategorySidebar({
 }: CategorySidebarProps) {
     const { text } = useI18n();
 
+    const getCategoryLabel = (category: Category) => {
+        const englishFromSlug = category.slug
+            ? category.slug
+                  .split('-')
+                  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+                  .join(' ')
+            : category.name;
+
+        return text(category.name, englishFromSlug);
+    };
+
     return (
         <aside className="lg:col-span-1">
             <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-800">
@@ -80,7 +91,7 @@ export function CategorySidebar({
                                             : ''
                                     }
                                 >
-                                    {category.name}
+                                    {getCategoryLabel(category)}
                                     {category.products_count && (
                                         <span
                                             className={`ml-2 text-xs ${

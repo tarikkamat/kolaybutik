@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Trash2 } from 'lucide-react';
+import { useI18n } from '@/i18n';
 import { useState } from 'react';
 
 interface DeleteLinkFormProps {
@@ -21,10 +22,18 @@ export default function DeleteLinkForm({
     loading,
     onSubmit,
 }: DeleteLinkFormProps) {
+    const { text } = useI18n();
     const [token, setToken] = useState('');
 
     const handleSubmit = async () => {
-        if (!confirm('Bu linki silmek istediğinizden emin misiniz?')) {
+        if (
+            !confirm(
+                text(
+                    'Bu linki silmek istediğinizden emin misiniz?',
+                    'Are you sure you want to delete this link?',
+                ),
+            )
+        ) {
             return;
         }
         await onSubmit(token);
@@ -34,17 +43,21 @@ export default function DeleteLinkForm({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Link Sil</CardTitle>
-                <CardDescription>Bir linki silin</CardDescription>
+                <CardTitle>{text('Link Sil', 'Delete Link')}</CardTitle>
+                <CardDescription>
+                    {text('Bir linki silin', 'Delete a link')}
+                </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div>
-                    <Label htmlFor="delete-token">Token *</Label>
+                    <Label htmlFor="delete-token">
+                        {text('Token *', 'Token *')}
+                    </Label>
                     <Input
                         id="delete-token"
                         value={token}
                         onChange={(e) => setToken(e.target.value)}
-                        placeholder="Link token'ı"
+                        placeholder={text("Link token'ı", 'Link token')}
                     />
                 </div>
                 <Button
@@ -58,10 +71,9 @@ export default function DeleteLinkForm({
                     ) : (
                         <Trash2 className="mr-2 h-4 w-4" />
                     )}
-                    Link Sil
+                    {text('Link Sil', 'Delete Link')}
                 </Button>
             </CardContent>
         </Card>
     );
 }
-

@@ -1,5 +1,10 @@
 import { QuickDemoButton } from '@/components/quick-demo-button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+} from '@/components/ui/card';
 import { useI18n } from '@/i18n';
 import { Code, CreditCard, ExternalLink, Lock } from 'lucide-react';
 
@@ -21,8 +26,8 @@ export default function PaymentMethodsSection() {
                     </p>
                 </div>
 
-                <div className="grid gap-8 md:grid-cols-3">
-                    <Card className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
+                <div className="grid gap-8 items-stretch md:grid-cols-3">
+                    <Card className="h-full border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
                         <CardHeader>
                             <div className="mb-4 inline-flex items-center rounded-lg bg-[color:var(--iyzico-denim)]/10 p-3 dark:bg-[color:var(--iyzico-denim)]/20">
                                 <Code className="h-6 w-6 !text-[color:var(--iyzico-denim)]" />
@@ -31,11 +36,11 @@ export default function PaymentMethodsSection() {
                                 </div>
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <p className="mb-4 text-slate-600 dark:text-slate-400">
+                        <CardContent className="flex flex-1 flex-col gap-4">
+                            <p className="text-slate-600 dark:text-slate-400">
                                 {t('landing.paymentMethods.pos.description')}
                             </p>
-                            <ul className="mb-6 space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li className="flex items-center gap-2">
                                     <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
                                     <span>
@@ -61,16 +66,18 @@ export default function PaymentMethodsSection() {
                                     </span>
                                 </li>
                             </ul>
+                        </CardContent>
+                        <CardFooter className="pt-0">
                             <QuickDemoButton
                                 href="/demo/credit-card"
                                 color="indigo"
                             >
                                 {t('common.tryNow')}
                             </QuickDemoButton>
-                        </CardContent>
+                        </CardFooter>
                     </Card>
 
-                    <Card className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
+                    <Card className="h-full border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
                         <CardHeader>
                             <div className="mb-4 inline-flex items-center rounded-lg bg-[color:var(--iyzico-bittersweet)]/10 p-3 dark:bg-[color:var(--iyzico-bittersweet)]/20">
                                 <CreditCard className="h-6 w-6 !text-[color:var(--iyzico-bittersweet)]" />
@@ -79,13 +86,13 @@ export default function PaymentMethodsSection() {
                                 </div>
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <p className="mb-4 text-slate-600 dark:text-slate-400">
+                        <CardContent className="flex flex-1 flex-col gap-4">
+                            <p className="text-slate-600 dark:text-slate-400">
                                 {t(
                                     'landing.paymentMethods.checkout.description',
                                 )}
                             </p>
-                            <ul className="mb-6 space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li className="flex items-center gap-2">
                                     <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
                                     <span>
@@ -111,16 +118,18 @@ export default function PaymentMethodsSection() {
                                     </span>
                                 </li>
                             </ul>
+                        </CardContent>
+                        <CardFooter className="pt-0">
                             <QuickDemoButton
                                 href="/demo/checkout-form"
                                 color="emerald"
                             >
                                 {t('common.tryNow')}
                             </QuickDemoButton>
-                        </CardContent>
+                        </CardFooter>
                     </Card>
 
-                    <Card className="border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
+                    <Card className="h-full border-slate-200 transition-shadow hover:shadow-lg dark:border-slate-800">
                         <CardHeader>
                             <div className="mb-4 inline-flex items-center rounded-lg bg-[color:var(--kaamaru)]/10 p-3 dark:bg-[color:var(--kaamaru)]/20">
                                 <ExternalLink className="h-6 w-6 !text-[color:var(--kaamaru)]" />
@@ -129,11 +138,11 @@ export default function PaymentMethodsSection() {
                                 </div>
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <p className="mb-4 text-slate-600 dark:text-slate-400">
+                        <CardContent className="flex flex-1 flex-col gap-4">
+                            <p className="text-slate-600 dark:text-slate-400">
                                 {t('landing.paymentMethods.pwi.description')}
                             </p>
-                            <ul className="mb-6 space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li className="flex items-center gap-2">
                                     <Lock className="h-4 w-4 text-[color:var(--kaamaru)]" />
                                     <span>
@@ -159,13 +168,15 @@ export default function PaymentMethodsSection() {
                                     </span>
                                 </li>
                             </ul>
+                        </CardContent>
+                        <CardFooter className="pt-0">
                             <QuickDemoButton
                                 href="/demo/pay-with-iyzico"
                                 color="amber"
                             >
                                 {t('common.tryNow')}
                             </QuickDemoButton>
-                        </CardContent>
+                        </CardFooter>
                     </Card>
                 </div>
             </div>

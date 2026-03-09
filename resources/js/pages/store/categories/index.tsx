@@ -10,6 +10,17 @@ interface CategoriesIndexProps {
 export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
     const { text } = useI18n();
 
+    const getCategoryLabel = (category: Category) => {
+        const englishFromSlug = category.slug
+            ? category.slug
+                  .split('-')
+                  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+                  .join(' ')
+            : category.name;
+
+        return text(category.name, englishFromSlug);
+    };
+
     return (
         <StoreLayout title={text('Kategoriler', 'Categories')}>
             <Head title={text('Kategoriler', 'Categories')} />
@@ -35,7 +46,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                                 className="group rounded-lg border border-slate-200 bg-white p-6 text-center transition-shadow hover:shadow-lg dark:border-slate-800 dark:bg-slate-800"
                             >
                                 <h3 className="mb-2 text-xl font-semibold text-slate-900 group-hover:text-indigo-600 dark:text-white">
-                                    {category.name}
+                                    {getCategoryLabel(category)}
                                 </h3>
                                 {category.products_count !== undefined && (
                                     <p className="text-sm text-slate-600 dark:text-slate-400">

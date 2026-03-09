@@ -17,6 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useI18n } from '@/i18n';
 import { useState } from 'react';
 import { Zap, Sparkles } from 'lucide-react';
 
@@ -36,6 +37,8 @@ export default function FastlinkForm({
     loading,
     onSubmit,
 }: FastlinkFormProps) {
+    const { text } = useI18n();
+
     const [form, setForm] = useState<FastlinkFormData>({
         description: '',
         price: '',
@@ -45,7 +48,10 @@ export default function FastlinkForm({
 
     const handleAutoFill = () => {
         setForm({
-            description: 'Hızlı Ödeme Linki - Test Amaçlı',
+            description: text(
+                'Hızlı Ödeme Linki - Test Amaçlı',
+                'Fast Payment Link - For Testing',
+            ),
             price: '149.99',
             currencyCode: 'TRY',
             sourceType: 'WEB',
@@ -67,9 +73,11 @@ export default function FastlinkForm({
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div>
-                        <CardTitle>Fastlink Oluştur</CardTitle>
+                        <CardTitle>
+                            {text('Fastlink Oluştur', 'Create Fastlink')}
+                        </CardTitle>
                         <CardDescription>
-                            Hızlı ödeme linki oluşturun
+                            {text('Hızlı ödeme linki oluşturun', 'Create a fast payment link')}
                         </CardDescription>
                     </div>
                     <Button
@@ -80,13 +88,15 @@ export default function FastlinkForm({
                         className="flex items-center gap-2"
                     >
                         <Sparkles className="h-4 w-4" />
-                        Otomatik Doldur
+                        {text('Otomatik Doldur', 'Autofill')}
                     </Button>
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div>
-                    <Label htmlFor="fastlink-description">Açıklama *</Label>
+                    <Label htmlFor="fastlink-description">
+                        {text('Açıklama *', 'Description *')}
+                    </Label>
                     <Textarea
                         id="fastlink-description"
                         value={form.description}
@@ -96,11 +106,13 @@ export default function FastlinkForm({
                                 description: e.target.value,
                             })
                         }
-                        placeholder="Link açıklaması"
+                        placeholder={text('Link açıklaması', 'Link description')}
                     />
                 </div>
                 <div>
-                    <Label htmlFor="fastlink-price">Fiyat *</Label>
+                    <Label htmlFor="fastlink-price">
+                        {text('Fiyat *', 'Price *')}
+                    </Label>
                     <Input
                         id="fastlink-price"
                         type="number"
@@ -116,7 +128,9 @@ export default function FastlinkForm({
                     />
                 </div>
                 <div>
-                    <Label htmlFor="fastlink-currencyCode">Para Birimi</Label>
+                    <Label htmlFor="fastlink-currencyCode">
+                        {text('Para Birimi', 'Currency')}
+                    </Label>
                     <Select
                         value={form.currencyCode}
                         onValueChange={(value) =>
@@ -137,7 +151,9 @@ export default function FastlinkForm({
                     </Select>
                 </div>
                 <div>
-                    <Label htmlFor="fastlink-sourceType">Kaynak Tipi</Label>
+                    <Label htmlFor="fastlink-sourceType">
+                        {text('Kaynak Tipi', 'Source Type')}
+                    </Label>
                     <Select
                         value={form.sourceType}
                         onValueChange={(value) =>
@@ -170,10 +186,9 @@ export default function FastlinkForm({
                     ) : (
                         <Zap className="mr-2 h-4 w-4" />
                     )}
-                    Fastlink Oluştur
+                    {text('Fastlink Oluştur', 'Create Fastlink')}
                 </Button>
             </CardContent>
         </Card>
     );
 }
-

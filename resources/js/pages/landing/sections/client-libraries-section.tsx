@@ -83,14 +83,6 @@ export default function ClientLibrariesSection() {
                 icon: Code2,
                 color: 'blue',
             },
-            {
-                name: 'Go',
-                repo: 'iyzipay-go',
-                description: t('landing.clientLibraries.library.go'),
-                link: 'https://github.com/iyzico/iyzipay-go',
-                icon: Package,
-                color: 'rose',
-            },
         ],
         [t],
     );

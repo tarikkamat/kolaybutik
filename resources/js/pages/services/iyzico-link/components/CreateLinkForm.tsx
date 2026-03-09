@@ -17,6 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useI18n } from '@/i18n';
 import { useState } from 'react';
 import { Plus, Sparkles } from 'lucide-react';
 
@@ -45,6 +46,8 @@ export default function CreateLinkForm({
     onSubmit,
     onError,
 }: CreateLinkFormProps) {
+    const { text } = useI18n();
+
     const [form, setForm] = useState<CreateFormData>({
         name: '',
         description: '',
@@ -66,12 +69,22 @@ export default function CreateLinkForm({
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
-            onError('Lütfen geçerli bir resim dosyası seçin');
+            onError(
+                text(
+                    'Lütfen geçerli bir resim dosyası seçin',
+                    'Please select a valid image file',
+                ),
+            );
             return;
         }
 
         if (file.size > 5 * 1024 * 1024) {
-            onError('Resim boyutu 5MB\'dan küçük olmalıdır');
+            onError(
+                text(
+                    "Resim boyutu 5MB'dan küçük olmalıdır",
+                    'Image size must be under 5MB',
+                ),
+            );
             return;
         }
 
@@ -89,7 +102,12 @@ export default function CreateLinkForm({
             setImagePreview(base64String);
         };
         reader.onerror = () => {
-            onError('Resim yüklenirken bir hata oluştu');
+            onError(
+                text(
+                    'Resim yüklenirken bir hata oluştu',
+                    'An error occurred while uploading the image',
+                ),
+            );
         };
         reader.readAsDataURL(file);
     };
@@ -99,7 +117,9 @@ export default function CreateLinkForm({
             const imageUrl = 'https://placehold.co/800x600/6366f1/ffffff/png?text=Product+Image';
             const response = await fetch(imageUrl);
             if (!response.ok) {
-                throw new Error('Resim yüklenemedi');
+                throw new Error(
+                    text('Resim yüklenemedi', 'Image could not be loaded'),
+                );
             }
 
             const blob = await response.blob();
@@ -112,8 +132,11 @@ export default function CreateLinkForm({
                     : base64String;
 
                 setForm({
-                    name: 'Örnek Ürün Linki',
-                    description: 'Bu bir örnek ürün açıklamasıdır. Test amaçlı oluşturulmuştur.',
+                    name: text('Örnek Ürün Linki', 'Sample Product Link'),
+                    description: text(
+                        'Bu bir örnek ürün açıklamasıdır. Test amaçlı oluşturulmuştur.',
+                        'This is a sample product description for testing.',
+                    ),
                     price: '99.99',
                     currency: 'TRY',
                     addressIgnorable: true,
@@ -128,12 +151,23 @@ export default function CreateLinkForm({
             };
 
             reader.onerror = () => {
-                onError('Resim yüklenirken bir hata oluştu');
+                onError(
+                    text(
+                        'Resim yüklenirken bir hata oluştu',
+                        'An error occurred while uploading the image',
+                    ),
+                );
             };
 
             reader.readAsDataURL(blob);
         } catch (err: any) {
-            onError(err.message || 'Otomatik doldurma sırasında bir hata oluştu');
+            onError(
+                err.message ||
+                    text(
+                        'Otomatik doldurma sırasında bir hata oluştu',
+                        'An error occurred during autofill',
+                    ),
+            );
         }
     };
 
@@ -160,9 +194,14 @@ export default function CreateLinkForm({
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div>
-                        <CardTitle>iyzico Link Oluştur</CardTitle>
+                        <CardTitle>
+                            {text('iyzico Link Oluştur', 'Create iyzico Link')}
+                        </CardTitle>
                         <CardDescription>
-                            Yeni bir ödeme linki oluşturun
+                            {text(
+                                'Yeni bir ödeme linki oluşturun',
+                                'Create a new payment link',
+                            )}
                         </CardDescription>
                     </div>
                     <Button
@@ -173,13 +212,15 @@ export default function CreateLinkForm({
                         className="flex items-center gap-2"
                     >
                         <Sparkles className="h-4 w-4" />
-                        Otomatik Doldur
+                        {text('Otomatik Doldur', 'Autofill')}
                     </Button>
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div>
-                    <Label htmlFor="name">Link Adı *</Label>
+                    <Label htmlFor="name">
+                        {text('Link Adı *', 'Link Name *')}
+                    </Label>
                     <Input
                         id="name"
                         value={form.name}
@@ -189,11 +230,13 @@ export default function CreateLinkForm({
                                 name: e.target.value,
                             })
                         }
-                        placeholder="Ödeme Linki"
+                        placeholder={text('Ödeme Linki', 'Payment Link')}
                     />
                 </div>
                 <div>
-                    <Label htmlFor="description">Açıklama</Label>
+                    <Label htmlFor="description">
+                        {text('Açıklama', 'Description')}
+                    </Label>
                     <Textarea
                         id="description"
                         value={form.description}
@@ -203,11 +246,11 @@ export default function CreateLinkForm({
                                 description: e.target.value,
                             })
                         }
-                        placeholder="Link açıklaması"
+                        placeholder={text('Link açıklaması', 'Link description')}
                     />
                 </div>
                 <div>
-                    <Label htmlFor="price">Fiyat *</Label>
+                    <Label htmlFor="price">{text('Fiyat *', 'Price *')}</Label>
                     <Input
                         id="price"
                         type="number"
@@ -223,7 +266,9 @@ export default function CreateLinkForm({
                     />
                 </div>
                 <div>
-                    <Label htmlFor="currency">Para Birimi</Label>
+                    <Label htmlFor="currency">
+                        {text('Para Birimi', 'Currency')}
+                    </Label>
                     <Select
                         value={form.currency}
                         onValueChange={(value) =>
@@ -257,11 +302,13 @@ export default function CreateLinkForm({
                         className="h-4 w-4 rounded border-slate-300"
                     />
                     <Label htmlFor="addressIgnorable" className="cursor-pointer">
-                        Adres Gerekli Değil
+                        {text('Adres Gerekli Değil', 'Address Not Required')}
                     </Label>
                 </div>
                 <div>
-                    <Label htmlFor="soldLimit">Satış Limiti</Label>
+                    <Label htmlFor="soldLimit">
+                        {text('Satış Limiti', 'Sales Limit')}
+                    </Label>
                     <Input
                         id="soldLimit"
                         type="number"
@@ -272,7 +319,7 @@ export default function CreateLinkForm({
                                 soldLimit: e.target.value,
                             })
                         }
-                        placeholder="Boş bırakılabilir"
+                        placeholder={text('Boş bırakılabilir', 'Optional')}
                     />
                 </div>
                 <div className="flex items-center space-x-2">
@@ -289,11 +336,13 @@ export default function CreateLinkForm({
                         className="h-4 w-4 rounded border-slate-300"
                     />
                     <Label htmlFor="installmentRequested" className="cursor-pointer">
-                        Taksit Seçeneği
+                        {text('Taksit Seçeneği', 'Installment Option')}
                     </Label>
                 </div>
                 <div>
-                    <Label htmlFor="sourceType">Kaynak Tipi</Label>
+                    <Label htmlFor="sourceType">
+                        {text('Kaynak Tipi', 'Source Type')}
+                    </Label>
                     <Select
                         value={form.sourceType}
                         onValueChange={(value) =>
@@ -326,12 +375,14 @@ export default function CreateLinkForm({
                         className="h-4 w-4 rounded border-slate-300"
                     />
                     <Label htmlFor="stockEnabled" className="cursor-pointer">
-                        Stok Takibi
+                        {text('Stok Takibi', 'Stock Tracking')}
                     </Label>
                 </div>
                 {form.stockEnabled && (
                     <div>
-                        <Label htmlFor="stockCount">Stok Miktarı</Label>
+                        <Label htmlFor="stockCount">
+                            {text('Stok Miktarı', 'Stock Quantity')}
+                        </Label>
                         <Input
                             id="stockCount"
                             type="number"
@@ -342,12 +393,14 @@ export default function CreateLinkForm({
                                     stockCount: e.target.value,
                                 })
                             }
-                            placeholder="Stok miktarı"
+                            placeholder={text('Stok miktarı', 'Stock quantity')}
                         />
                     </div>
                 )}
                 <div>
-                    <Label htmlFor="image">Ürün Resmi *</Label>
+                    <Label htmlFor="image">
+                        {text('Ürün Resmi *', 'Product Image *')}
+                    </Label>
                     <Input
                         id="image"
                         type="file"
@@ -359,13 +412,16 @@ export default function CreateLinkForm({
                         <div className="mt-2">
                             <img
                                 src={imagePreview}
-                                alt="Önizleme"
+                                alt={text('Önizleme', 'Preview')}
                                 className="h-32 w-32 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
                             />
                         </div>
                     )}
                     <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                        Maksimum 5MB, JPG, PNG veya GIF formatında
+                        {text(
+                            'Maksimum 5MB, JPG, PNG veya GIF formatında',
+                            'Maximum 5MB, JPG, PNG or GIF format',
+                        )}
                     </p>
                 </div>
                 <Button
@@ -383,10 +439,9 @@ export default function CreateLinkForm({
                     ) : (
                         <Plus className="mr-2 h-4 w-4" />
                     )}
-                    Link Oluştur
+                    {text('Link Oluştur', 'Create Link')}
                 </Button>
             </CardContent>
         </Card>
     );
 }
-

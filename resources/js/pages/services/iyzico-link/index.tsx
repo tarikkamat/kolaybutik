@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { TabType, IyzicoLink } from './types';
+import { useI18n } from '@/i18n';
 import CreateLinkForm, { CreateFormData } from './components/CreateLinkForm';
 import FastlinkForm, { FastlinkFormData } from './components/FastlinkForm';
 import RetrieveLinkForm from './components/RetrieveLinkForm';
@@ -34,6 +35,9 @@ export default function IyzicoLinkPage() {
         name: string;
         description: string;
     } | null>(null);
+
+    const { text } = useI18n();
+    const defaultErrorMessage = text('Bir hata oluştu', 'An error occurred');
 
     const csrfToken =
         document
@@ -77,14 +81,16 @@ export default function IyzicoLinkPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.errorMessage || data.message || 'Bir hata oluştu');
+                setError(
+                    data.errorMessage || data.message || defaultErrorMessage,
+                );
                 return;
             }
 
             setResult(data);
             setSelectedLink(data.data);
         } catch (err: any) {
-            setError(err.message || 'Bir hata oluştu');
+            setError(err.message || defaultErrorMessage);
         } finally {
             setLoading(false);
         }
@@ -109,14 +115,16 @@ export default function IyzicoLinkPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.errorMessage || data.message || 'Bir hata oluştu');
+                setError(
+                    data.errorMessage || data.message || defaultErrorMessage,
+                );
                 return;
             }
 
             setResult(data);
             setSelectedLink(data.data);
         } catch (err: any) {
-            setError(err.message || 'Bir hata oluştu');
+            setError(err.message || defaultErrorMessage);
         } finally {
             setLoading(false);
         }
@@ -141,14 +149,16 @@ export default function IyzicoLinkPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.errorMessage || data.message || 'Bir hata oluştu');
+                setError(
+                    data.errorMessage || data.message || defaultErrorMessage,
+                );
                 return;
             }
 
             setResult(data);
             setSelectedLink(data.data);
         } catch (err: any) {
-            setError(err.message || 'Bir hata oluştu');
+            setError(err.message || defaultErrorMessage);
         } finally {
             setLoading(false);
         }
@@ -173,14 +183,16 @@ export default function IyzicoLinkPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.errorMessage || data.message || 'Bir hata oluştu');
+                setError(
+                    data.errorMessage || data.message || defaultErrorMessage,
+                );
                 return;
             }
 
             setResult(data);
             setLinks(data.data?.links || []);
         } catch (err: any) {
-            setError(err.message || 'Bir hata oluştu');
+            setError(err.message || defaultErrorMessage);
         } finally {
             setLoading(false);
         }
@@ -205,14 +217,16 @@ export default function IyzicoLinkPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.errorMessage || data.message || 'Bir hata oluştu');
+                setError(
+                    data.errorMessage || data.message || defaultErrorMessage,
+                );
                 return;
             }
 
             setResult(data);
             setSelectedLink(data.data);
         } catch (err: any) {
-            setError(err.message || 'Bir hata oluştu');
+            setError(err.message || defaultErrorMessage);
         } finally {
             setLoading(false);
         }
@@ -240,7 +254,9 @@ export default function IyzicoLinkPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.errorMessage || data.message || 'Bir hata oluştu');
+                setError(
+                    data.errorMessage || data.message || defaultErrorMessage,
+                );
                 return;
             }
 
@@ -249,7 +265,7 @@ export default function IyzicoLinkPage() {
                 handleList();
             }
         } catch (err: any) {
-            setError(err.message || 'Bir hata oluştu');
+            setError(err.message || defaultErrorMessage);
         } finally {
             setLoading(false);
         }
@@ -274,7 +290,9 @@ export default function IyzicoLinkPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.errorMessage || data.message || 'Bir hata oluştu');
+                setError(
+                    data.errorMessage || data.message || defaultErrorMessage,
+                );
                 return;
             }
 
@@ -283,7 +301,7 @@ export default function IyzicoLinkPage() {
                 handleList();
             }
         } catch (err: any) {
-            setError(err.message || 'Bir hata oluştu');
+            setError(err.message || defaultErrorMessage);
         } finally {
             setLoading(false);
         }
@@ -306,7 +324,7 @@ export default function IyzicoLinkPage() {
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-            <Head title="iyzico Link Yönetimi" />
+            <Head title={text('iyzico Link Yönetimi', 'iyzico Link Management')} />
 
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 {/* Header */}
@@ -316,13 +334,16 @@ export default function IyzicoLinkPage() {
                         className="mb-4 inline-flex items-center text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                     >
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Servislere Geri Dön
+                        {text('Servislere Geri Dön', 'Back to Services')}
                     </Link>
                     <h1 className="mb-2 text-3xl font-bold text-slate-900 dark:text-white">
-                        iyzico Link Yönetimi
+                        {text('iyzico Link Yönetimi', 'iyzico Link Management')}
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">
-                        iyzico Link oluşturun, güncelleyin, listeleyin ve yönetin
+                        {text(
+                            'iyzico Link oluşturun, güncelleyin, listeleyin ve yönetin',
+                            'Create, update, list, and manage iyzico Links',
+                        )}
                     </p>
                 </div>
 
@@ -337,7 +358,7 @@ export default function IyzicoLinkPage() {
                         }`}
                     >
                         <Plus className="mr-2 inline h-4 w-4" />
-                        Link Oluştur
+                        {text('Link Oluştur', 'Create Link')}
                     </button>
                     <button
                         onClick={() => setActiveTab('fastlink')}
@@ -348,7 +369,7 @@ export default function IyzicoLinkPage() {
                         }`}
                     >
                         <Zap className="mr-2 inline h-4 w-4" />
-                        Fastlink Oluştur
+                        {text('Fastlink Oluştur', 'Create Fastlink')}
                     </button>
                     <button
                         onClick={() => {
@@ -362,7 +383,7 @@ export default function IyzicoLinkPage() {
                         }`}
                     >
                         <Search className="mr-2 inline h-4 w-4" />
-                        Link Listele
+                        {text('Link Listele', 'List Links')}
                     </button>
                     <button
                         onClick={() => setActiveTab('retrieve')}
@@ -373,7 +394,7 @@ export default function IyzicoLinkPage() {
                         }`}
                     >
                         <Search className="mr-2 inline h-4 w-4" />
-                        Link Detayı
+                        {text('Link Detayı', 'Link Details')}
                     </button>
                     <button
                         onClick={() => setActiveTab('update')}
@@ -384,7 +405,7 @@ export default function IyzicoLinkPage() {
                         }`}
                     >
                         <Edit className="mr-2 inline h-4 w-4" />
-                        Link Güncelle
+                        {text('Link Güncelle', 'Update Link')}
                     </button>
                     <button
                         onClick={() => setActiveTab('delete')}
@@ -395,7 +416,7 @@ export default function IyzicoLinkPage() {
                         }`}
                     >
                         <Trash2 className="mr-2 inline h-4 w-4" />
-                        Link Sil
+                        {text('Link Sil', 'Delete Link')}
                     </button>
                 </div>
 
@@ -412,7 +433,8 @@ export default function IyzicoLinkPage() {
                     <Alert className="mb-6 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20">
                         <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
                         <AlertDescription className="text-green-800 dark:text-green-200">
-                            {result.message || 'İşlem başarılı'}
+                            {result.message ||
+                                text('İşlem başarılı', 'Operation successful')}
                         </AlertDescription>
                     </Alert>
                 )}

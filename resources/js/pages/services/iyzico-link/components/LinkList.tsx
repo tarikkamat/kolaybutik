@@ -7,6 +7,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Check, Copy, Edit, ExternalLink } from 'lucide-react';
+import { useI18n } from '@/i18n';
 import { IyzicoLink } from '../types';
 
 interface LinkListProps {
@@ -22,16 +23,20 @@ export default function LinkList({
     onCopyToken,
     onEdit,
 }: LinkListProps) {
+    const { text } = useI18n();
+
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Link Listesi</CardTitle>
-                <CardDescription>Oluşturulan linkler</CardDescription>
+                <CardTitle>{text('Link Listesi', 'Link List')}</CardTitle>
+                <CardDescription>
+                    {text('Oluşturulan linkler', 'Created links')}
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 {links.length === 0 ? (
                     <p className="text-center text-slate-500 dark:text-slate-400">
-                        Henüz link oluşturulmamış
+                        {text('Henüz link oluşturulmamış', 'No links created yet')}
                     </p>
                 ) : (
                     <div className="space-y-4">
@@ -75,7 +80,7 @@ export default function LinkList({
                                         ) : (
                                             <Copy className="mr-1 h-3 w-3" />
                                         )}
-                                        Token
+                                        {text('Token', 'Token')}
                                     </Button>
                                     {link.url && (
                                         <Button
@@ -86,7 +91,7 @@ export default function LinkList({
                                             }
                                         >
                                             <ExternalLink className="mr-1 h-3 w-3" />
-                                            Linki Aç
+                                            {text('Linki Aç', 'Open Link')}
                                         </Button>
                                     )}
                                     <Button
@@ -95,7 +100,7 @@ export default function LinkList({
                                         onClick={() => onEdit(link)}
                                     >
                                         <Edit className="mr-1 h-3 w-3" />
-                                        Düzenle
+                                        {text('Düzenle', 'Edit')}
                                     </Button>
                                 </div>
                             </div>

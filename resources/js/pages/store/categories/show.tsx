@@ -19,10 +19,20 @@ export default function CategoryShow({
 }: CategoryShowProps) {
     const { addingToCart, handleAddToCart } = useAddToCart();
     const { text } = useI18n();
+    const getCategoryLabel = (cat: Category) => {
+        const englishFromSlug = cat.slug
+            ? cat.slug
+                  .split('-')
+                  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+                  .join(' ')
+            : cat.name;
+
+        return text(cat.name, englishFromSlug);
+    };
 
     return (
-        <StoreLayout title={category.name}>
-            <Head title={category.name} />
+        <StoreLayout title={getCategoryLabel(category)}>
+            <Head title={getCategoryLabel(category)} />
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 {/* Breadcrumb */}
                 <nav className="mb-8 text-sm">
@@ -46,7 +56,7 @@ export default function CategoryShow({
                         </li>
                         <li className="text-slate-400">/</li>
                         <li className="text-slate-900 dark:text-white">
-                            {category.name}
+                            {getCategoryLabel(category)}
                         </li>
                     </ol>
                 </nav>
@@ -54,7 +64,7 @@ export default function CategoryShow({
                 {/* Category Header */}
                 <div className="mb-12">
                     <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
-                        {category.name}
+                        {getCategoryLabel(category)}
                     </h1>
                     {products.total !== undefined && (
                         <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">
@@ -125,7 +135,7 @@ export default function CategoryShow({
                                     className="rounded-lg border border-slate-200 bg-white p-4 text-center transition-shadow hover:shadow-lg dark:border-slate-800 dark:bg-slate-800"
                                 >
                                     <h3 className="font-semibold text-slate-900 hover:text-indigo-600 dark:text-white">
-                                        {relatedCategory.name}
+                                        {getCategoryLabel(relatedCategory)}
                                     </h3>
                                 </Link>
                             ))}
