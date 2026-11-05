@@ -7,6 +7,7 @@ import { Product } from '@/types/models';
 import { Head, Link } from '@inertiajs/react';
 import { ShoppingCart } from 'lucide-react';
 import { ProductCard } from '../components/product-card';
+import { PwiWidget } from './components/pwi-widget';
 
 interface ProductShowProps {
     product: Product;
@@ -121,6 +122,9 @@ export default function ProductShow({
                                 </span>
                             )}
                         </div>
+
+                        {/* Pay with iyzico Widget */}
+                        <PwiWidget productSlug={product.slug} />
 
                         <div className="mb-8 rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-800">
                             <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">

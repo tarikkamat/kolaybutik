@@ -1245,16 +1245,16 @@
         },
         {
             "name": "iyzico/iyzipay-php",
-            "version": "v2.0.60",
+            "version": "v2.0.64",
             "source": {
                 "type": "git",
                 "url": "https://github.com/iyzico/iyzipay-php.git",
-                "reference": "fda153102f4dc9ffdebc72a6ab47c83123e8333e"
+                "reference": "ee979169ece11cc8e22a77b0efa8869339e8a210"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/iyzico/iyzipay-php/zipball/fda153102f4dc9ffdebc72a6ab47c83123e8333e",
-                "reference": "fda153102f4dc9ffdebc72a6ab47c83123e8333e",
+                "url": "https://api.github.com/repos/iyzico/iyzipay-php/zipball/ee979169ece11cc8e22a77b0efa8869339e8a210",
+                "reference": "ee979169ece11cc8e22a77b0efa8869339e8a210",
                 "shasum": ""
             },
             "require": {
@@ -1262,8 +1262,7 @@
                 "php": ">=7.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~9.6",
-                "satooshi/php-coveralls": "~0.6.1"
+                "phpunit/phpunit": "^9.6.34"
             },
             "type": "library",
             "autoload": {
@@ -1295,9 +1294,9 @@
             ],
             "support": {
                 "issues": "https://github.com/iyzico/iyzipay-php/issues",
-                "source": "https://github.com/iyzico/iyzipay-php/tree/v2.0.60"
+                "source": "https://github.com/iyzico/iyzipay-php/tree/v2.0.64"
             },
-            "time": "2026-02-11T10:44:12+00:00"
+            "time": "2026-11-05T06:54:05+00:00"
         },
         {
             "name": "laminas/laminas-diactoros",

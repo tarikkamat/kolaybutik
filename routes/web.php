@@ -217,5 +217,6 @@ Route::prefix('store')->name('store.')->group(function () {
 
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/{slug}', [StoreProductController::class, 'show'])->name('show');
+        Route::get('/{slug}/pwi-widget', [StoreProductController::class, 'pwiWidget'])->name('pwi-widget');
     });
 });
