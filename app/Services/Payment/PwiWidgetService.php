@@ -7,69 +7,95 @@ use App\Services\Payment\Support\LocaleResolver;
 use App\Traits\RedisCache;
 use Illuminate\Support\Facades\Log;
 use Iyzipay\Model\Currency;
+use Iyzipay\Model\PayWithIyzicoWidgetBasketItem;
 use Iyzipay\Model\PayWithIyzicoWidgetInitialize;
 use Iyzipay\Model\PayWithIyzicoWidgetPaymentPlan;
-use Iyzipay\Model\PayWithIyzicoWidgetBasketItem;
 use Iyzipay\Options;
 use Iyzipay\Request\CreatePayWithIyzicoWidgetInitializeRequest;
 use Iyzipay\Request\RetrievePayWithIyzicoWidgetPaymentPlanRequest;
 
 /**
- * Pay with iyzico (PWI) Widget
+ * Pay with iyzico Widget - Alışveriş Kredisi
  *
- * Ürün detay sayfasında "iyzico ile öde" taksit / alışveriş kredisi bilgisini gösterir.
- * 1) /v1/pay-with-iyzico/widget/init          -> widgetToken + widgetContent (script)
- * 2) /v1/pay-with-iyzico/widget/credit/payment-plan -> banka bazlı kredi planları
+ * 1) /v1/pay-with-iyzico/widget/init
+ *    Ürün sayfası açılırken çağrılır. widgetToken ile "X aya varan, aylık Y TL" özetini döner.
+ * 2) /v1/pay-with-iyzico/widget/credit/payment-plan
+ *    Kullanıcı "Alışveriş Kredisi"ni açınca widgetToken ile çağrılır; banka logoları ve vade planlarını döner.
  */
 class PwiWidgetService
 {
     use RedisCache;
 
-    /** Widget sadece gösterim amaçlı; her sayfa görüntülemede iyzico'ya gitmemek için kısa süre cache'lenir. */
-    private const CACHE_TTL_SECONDS = 600;
+    /** Aynı ürün için her görüntülemede iyzico'ya gitmemek için kısa süreli cache. */
+    private const CACHE_TTL_SECONDS = 300;
 
+    /** Widget'ta gösterilecek en uzun vade. */
     private const MAX_INSTALLMENT = 12;
+
+    /** iyzico Alışveriş Kredisi alt limiti (TL). */
+    private const MIN_CREDIT_AMOUNT = 500;
 
     private Options $options;
 
     public function __construct()
     {
-        // Widget, PWI açık olan Quick PWI merchant'ı ile çalışır.
-        $config = config('iyzipay.quick_pwi');
-
-        $this->options = new Options();
-        $this->options->setApiKey($config['api_key']);
-        $this->options->setSecretKey($config['secret_key']);
-        $this->options->setBaseUrl($config['base_url']);
+        // Alışveriş kredisi ana merchant hesabında açık (creditEnabled: true).
+        $this->options = new Options;
+        $this->options->setApiKey(config('iyzipay.api_key'));
+        $this->options->setSecretKey(config('iyzipay.secret_key'));
+        $this->options->setBaseUrl(config('iyzipay.base_url'));
     }
 
-    public function getProductWidget(Product $product, ?string $locale = null): array
+    /**
+     * Widget init: token + kredi özeti.
+     */
+    public function initialize(Product $product, ?string $locale = null): array
     {
         $locale = LocaleResolver::resolve($locale);
         $price = $this->effectivePrice($product);
-        $cacheKey = sprintf('product:%d:%s:%s', $product->id, $price, $locale);
 
-        $cached = $this->remember($cacheKey, fn () => $this->fetchWidget($product, $price, $locale), self::CACHE_TTL_SECONDS);
+        return $this->rememberSuccess(
+            sprintf('init:%d:%s:%s', $product->id, $price, $locale),
+            function () use ($product, $price, $locale) {
+                $result = $this->fetchInitialize($product, $price, $locale);
 
-        // Hata cevaplarını cache'te tutma, bir sonraki istekte tekrar denensin.
-        if (($cached['status'] ?? null) !== 'success') {
-            $this->forget($cacheKey);
-        }
+                // iyzico zaman zaman kredi özetini boş (`maxInstallment:{}`) dönüyor; bir kez daha dene.
+                if ($this->isMissingCreditSummary($result)) {
+                    $result = $this->fetchInitialize($product, $price, $locale);
+                }
 
-        return $cached;
+                return $result;
+            },
+            fn (array $result) => ! $this->isMissingCreditSummary($result),
+        );
     }
 
-    private function fetchWidget(Product $product, string $price, string $locale): array
+    /**
+     * Banka bazlı alışveriş kredisi planları.
+     */
+    public function paymentPlans(string $widgetToken, ?string $locale = null): array
+    {
+        $locale = LocaleResolver::resolve($locale);
+
+        return $this->rememberSuccess(
+            sprintf('plan:%s:%s', $widgetToken, $locale),
+            fn () => $this->fetchPaymentPlans($widgetToken, $locale),
+            // Boş banka listesini cache'leme, bir sonraki açılışta tekrar denensin.
+            fn (array $result) => ! empty($result['banks']),
+        );
+    }
+
+    private function fetchInitialize(Product $product, string $price, string $locale): array
     {
         try {
-            $request = new CreatePayWithIyzicoWidgetInitializeRequest();
+            $request = new CreatePayWithIyzicoWidgetInitializeRequest;
             $request->setLocale($locale);
             $request->setConversationId(uniqid('pwi_widget_', true));
             $request->setPrice($price);
             $request->setCurrency(Currency::TL);
             $request->setInstallment(self::MAX_INSTALLMENT);
 
-            $basketItem = new PayWithIyzicoWidgetBasketItem();
+            $basketItem = new PayWithIyzicoWidgetBasketItem;
             $basketItem->setPrice($price);
             $basketItem->setName($product->name);
             $basketItem->setCategory($product->category?->name ?? 'OTHERS');
@@ -84,104 +110,137 @@ class PwiWidgetService
                     'errorMessage' => $initialize->getErrorMessage(),
                 ]);
 
-                return [
-                    'status' => 'error',
-                    'errorCode' => $initialize->getErrorCode(),
-                    'errorMessage' => $initialize->getErrorMessage(),
-                ];
+                return $this->error($initialize->getErrorCode(), $initialize->getErrorMessage());
             }
 
-            $widgetContent = (string) $initialize->getWidgetContent();
-            $widgetInit = $this->parseWidgetInit($widgetContent);
-
-            $plans = $widgetInit['creditEnabled']
-                ? $this->fetchPaymentPlans($initialize->getWidgetToken(), $locale)
-                : [];
+            // widgetContent sayfaya basılmıyor (yüklediği JS/CSS adresleri boş geliyor);
+            // sadece içindeki kredi özetini okumak için kullanılıyor.
+            $widgetInit = $this->parseWidgetInit((string) $initialize->getWidgetContent());
 
             return [
                 'status' => 'success',
                 'widgetToken' => $initialize->getWidgetToken(),
-                // Script'in yüklediği CSS/JS adresleri boş dönebiliyor; boşsa frontend'e
-                // vermiyoruz, aksi halde tarayıcı sayfanın kendisini script olarak yükler.
-                'widgetContent' => $this->hasLoadableAssets($widgetContent) ? $widgetContent : null,
                 'price' => (float) $price,
                 'currency' => Currency::TL,
-                'payWithIyzicoEnabled' => $widgetInit['payWithIyzicoEnabled'],
                 'creditEnabled' => $widgetInit['creditEnabled'],
+                'payWithIyzicoEnabled' => $widgetInit['payWithIyzicoEnabled'],
                 'maxInstallment' => $widgetInit['maxInstallment'],
                 'installmentPrice' => $widgetInit['installmentPrice'],
-                'creditPlans' => $plans,
             ];
         } catch (\Throwable $e) {
-            Log::error('PwiWidgetService: exception', [
+            Log::error('PwiWidgetService: init exception', [
                 'product_id' => $product->id,
                 'error' => $e->getMessage(),
             ]);
 
-            return [
-                'status' => 'error',
-                'errorCode' => 'EXCEPTION',
-                'errorMessage' => $e->getMessage(),
-            ];
+            return $this->error('EXCEPTION', $e->getMessage());
         }
     }
 
-    /**
-     * Banka bazlı alışveriş kredisi planları.
-     */
     private function fetchPaymentPlans(string $widgetToken, string $locale): array
     {
-        $request = new RetrievePayWithIyzicoWidgetPaymentPlanRequest();
-        $request->setLocale($locale);
-        $request->setConversationId(uniqid('pwi_widget_plan_', true));
-        $request->setWidgetToken($widgetToken);
+        try {
+            $request = new RetrievePayWithIyzicoWidgetPaymentPlanRequest;
+            $request->setLocale($locale);
+            $request->setConversationId(uniqid('pwi_widget_plan_', true));
+            $request->setWidgetToken($widgetToken);
 
-        $response = PayWithIyzicoWidgetPaymentPlan::retrieve($request, $this->options);
+            $response = PayWithIyzicoWidgetPaymentPlan::retrieve($request, $this->options);
 
-        if ($response->getStatus() !== 'success') {
-            Log::warning('PwiWidgetService: payment-plan failed', [
-                'errorCode' => $response->getErrorCode(),
-                'errorMessage' => $response->getErrorMessage(),
-            ]);
+            if ($response->getStatus() !== 'success') {
+                Log::warning('PwiWidgetService: payment-plan failed', [
+                    'errorCode' => $response->getErrorCode(),
+                    'errorMessage' => $response->getErrorMessage(),
+                ]);
 
-            return [];
-        }
-
-        $plans = [];
-        foreach ($response->getFilteredPlans() ?? [] as $bankPlan) {
-            $terms = [];
-            foreach ($bankPlan->getMonthlyPayments() ?? [] as $monthlyPayment) {
-                foreach ($monthlyPayment->getPaymentPlans() ?? [] as $detail) {
-                    $terms[] = [
-                        'productType' => $monthlyPayment->getProductType(),
-                        'term' => (int) $detail->getTerm(),
-                        'interestRate' => (float) $detail->getInterestRate(),
-                        'amount' => (float) $detail->getAmount(),
-                        'totalPaymentAmount' => (float) $detail->getTotalPaymentAmount(),
-                        'annualEffectiveInterestRate' => $detail->getAnnualEffectiveInterestRate() !== null
-                            ? (float) $detail->getAnnualEffectiveInterestRate()
-                            : null,
-                    ];
-                }
+                return $this->error($response->getErrorCode(), $response->getErrorMessage());
             }
 
-            usort($terms, fn ($a, $b) => [$a['term'], $a['productType']] <=> [$b['term'], $b['productType']]);
+            $banks = [];
+            foreach ($response->getFilteredPlans() ?? [] as $bankPlan) {
+                $products = [];
+                $lowestAmount = null;
 
-            $plans[] = [
-                'bankId' => $bankPlan->getBankId(),
-                'bankName' => $bankPlan->getBankName(),
-                'bankLogoUrl' => $bankPlan->getBankLogoUrl(),
-                'existingCustomer' => (bool) $bankPlan->getExistingCustomer(),
-                'terms' => $terms,
+                foreach ($bankPlan->getMonthlyPayments() ?? [] as $monthlyPayment) {
+                    $terms = [];
+                    foreach ($monthlyPayment->getPaymentPlans() ?? [] as $detail) {
+                        $amount = (float) $detail->getAmount();
+                        $lowestAmount = $lowestAmount === null ? $amount : min($lowestAmount, $amount);
+
+                        $terms[] = [
+                            'term' => (int) $detail->getTerm(),
+                            'interestRate' => (float) $detail->getInterestRate(),
+                            'amount' => $amount,
+                            'totalPaymentAmount' => (float) $detail->getTotalPaymentAmount(),
+                            'annualEffectiveInterestRate' => $detail->getAnnualEffectiveInterestRate() !== null
+                                ? (float) $detail->getAnnualEffectiveInterestRate()
+                                : null,
+                        ];
+                    }
+
+                    usort($terms, fn ($a, $b) => $a['term'] <=> $b['term']);
+
+                    $products[] = [
+                        'productType' => $monthlyPayment->getProductType(),
+                        'terms' => $terms,
+                        'campaigns' => $monthlyPayment->getCampaigns() ?? [],
+                    ];
+                }
+
+                $banks[] = [
+                    'bankId' => $bankPlan->getBankId(),
+                    'bankName' => $bankPlan->getBankName(),
+                    'bankLogoUrl' => $bankPlan->getBankLogoUrl(),
+                    'existingCustomer' => (bool) $bankPlan->getExistingCustomer(),
+                    'lowestAmount' => $lowestAmount,
+                    'maxTerm' => max(array_merge([0], ...array_map(
+                        fn ($p) => array_column($p['terms'], 'term'),
+                        $products,
+                    ))),
+                    'products' => $products,
+                ];
+            }
+
+            return [
+                'status' => 'success',
+                'banks' => $banks,
             ];
-        }
+        } catch (\Throwable $e) {
+            Log::error('PwiWidgetService: payment-plan exception', ['error' => $e->getMessage()]);
 
-        return $plans;
+            return $this->error('EXCEPTION', $e->getMessage());
+        }
     }
 
     /**
-     * widgetContent içindeki `var widgetInit = {...}` objesinden taksit bilgilerini okur.
-     * Değer sayı değilse (ör. `maxInstallment:{}`) null döner.
+     * Sadece başarılı (ve $cacheable'a göre eksiksiz) cevapları cache'te tutar;
+     * diğerleri bir sonraki istekte tekrar denenir.
+     */
+    private function rememberSuccess(string $key, callable $callback, ?callable $cacheable = null): array
+    {
+        $result = $this->remember($key, $callback, self::CACHE_TTL_SECONDS);
+
+        if (($result['status'] ?? null) !== 'success' || ($cacheable && ! $cacheable($result))) {
+            $this->forget($key);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Kredi açık ve tutar kredi alt limitinin üstünde olduğu halde özet (vade/taksit) gelmediyse true.
+     */
+    private function isMissingCreditSummary(array $result): bool
+    {
+        return ($result['status'] ?? null) === 'success'
+            && ($result['creditEnabled'] ?? false)
+            && ($result['price'] ?? 0) >= self::MIN_CREDIT_AMOUNT
+            && ($result['maxInstallment'] === null || $result['installmentPrice'] === null);
+    }
+
+    /**
+     * widgetContent içindeki `var widgetInit = {...}` objesinden kredi özetini okur.
+     * Değer sayı değilse (ör. 500 TL altı tutarlarda `maxInstallment:{}`) null döner.
      */
     private function parseWidgetInit(string $widgetContent): array
     {
@@ -195,31 +254,11 @@ class PwiWidgetService
         $maxInstallment = $number('maxInstallment');
 
         return [
-            'payWithIyzicoEnabled' => $bool('payWithIyzicoEnabled'),
             'creditEnabled' => $bool('creditEnabled'),
+            'payWithIyzicoEnabled' => $bool('payWithIyzicoEnabled'),
             'maxInstallment' => $maxInstallment !== null ? (int) $maxInstallment : null,
             'installmentPrice' => $number('installmentPrice'),
         ];
-    }
-
-    /**
-     * Script'in eklediği <link href> ve <script src> değerleri gerçek bir adres mi?
-     */
-    private function hasLoadableAssets(string $widgetContent): bool
-    {
-        preg_match_all("/setAttribute\\(\\s*'(?:src|href)'\\s*,\\s*'([^']*)'\\s*\\)/", $widgetContent, $matches);
-
-        if (empty($matches[1])) {
-            return false;
-        }
-
-        foreach ($matches[1] as $url) {
-            if (! preg_match('#^(https?:)?//#i', $url)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private function effectivePrice(Product $product): string
@@ -229,5 +268,14 @@ class PwiWidgetService
             : $product->price;
 
         return number_format((float) $price, 2, '.', '');
+    }
+
+    private function error(?string $code, ?string $message): array
+    {
+        return [
+            'status' => 'error',
+            'errorCode' => $code,
+            'errorMessage' => $message,
+        ];
     }
 }

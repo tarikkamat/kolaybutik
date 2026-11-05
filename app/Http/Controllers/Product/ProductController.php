@@ -3,18 +3,14 @@
 namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
-use App\Services\Payment\PwiWidgetService;
 use App\Services\Product\ProductService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ProductController extends Controller
 {
     public function __construct(
-        protected ProductService $productService,
-        protected PwiWidgetService $pwiWidgetService,
+        protected ProductService $productService
     ) {
     }
 
@@ -34,27 +30,5 @@ class ProductController extends Controller
             'latestProducts' => $latestProducts,
         ]);
     }
-
-    /**
-     * Pay with iyzico widget verisi (taksit + alışveriş kredisi planları).
-     * Fiyat client'tan değil, veritabanındaki üründen alınır.
-     */
-    public function pwiWidget(Request $request, string $slug): JsonResponse
-    {
-        $validated = $request->validate([
-            'locale' => 'nullable|string|in:tr,en',
-        ]);
-
-        $product = $this->productService->findBySlugOrFail($slug);
-        $result = $this->pwiWidgetService->getProductWidget($product, $validated['locale'] ?? null);
-
-        if (($result['status'] ?? null) !== 'success') {
-            return response()->json([
-                'status' => 'error',
-                'errorMessage' => $result['errorMessage'] ?? 'Widget bilgisi alınamadı',
-            ], 502);
-        }
-
-        return response()->json($result);
-    }
 }
+

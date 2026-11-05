@@ -6,6 +6,7 @@ use App\Http\Controllers\Checkout\OrderController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Payment\ApiPaymentController;
 use App\Http\Controllers\Payment\AlternativePaymentController;
+use App\Http\Controllers\Payment\PwiWidgetController;
 use App\Http\Controllers\Product\CategoryController as StoreCategoryController;
 use App\Http\Controllers\Product\ProductController as StoreProductController;
 use App\Http\Controllers\Report\ReportsController;
@@ -203,6 +204,9 @@ Route::prefix('store')->name('store.')->group(function () {
             ->name('quick-pwi.callback');
     });
 
+    // Pay with iyzico Widget - Alışveriş Kredisi planları
+    Route::get('/pwi-widget/payment-plan', [PwiWidgetController::class, 'paymentPlan'])->name('pwi-widget.payment-plan');
+
     // Order routes
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/success', [OrderController::class, 'success'])->name('success');
@@ -217,6 +221,6 @@ Route::prefix('store')->name('store.')->group(function () {
 
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/{slug}', [StoreProductController::class, 'show'])->name('show');
-        Route::get('/{slug}/pwi-widget', [StoreProductController::class, 'pwiWidget'])->name('pwi-widget');
+        Route::get('/{slug}/pwi-widget', [PwiWidgetController::class, 'initialize'])->name('pwi-widget');
     });
 });
